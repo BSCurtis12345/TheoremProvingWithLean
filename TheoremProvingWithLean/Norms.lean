@@ -1,12 +1,17 @@
 import Mathlib.Algebra.Order.Group.Unbundled.Abs
+--import Mathlib.Order.Defs.LinearOrder
+--import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.Analysis.Normed.MulAction
 import Mathlib.Analysis.Normed.Module.Basic
+
+import TheoremProvingWithLean.Definitions
+
 
 set_option linter.style.longLine false
 
 variable {K V : Type*} [NormedField K] [NormedAddCommGroup V] [NormedSpace K V]
 
-theorem reverse_triangle_ineq (x y : V) : |‖x‖-‖y‖| ≤ ‖x-y‖ := by
+theorem reverse_triangle_ineq (x y : Rn n) : |RnNorm.N(x) - N (y)| ≤ N(x-y) := by
 /-
 This theorem proves the reverse triangle inequality for normed additive commutative groups |‖x‖-‖y‖| ≤ ‖x-y‖.
 
