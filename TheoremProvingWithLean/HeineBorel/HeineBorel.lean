@@ -1,4 +1,7 @@
 import Mathlib -- will specify imports later
+import TheoremProvingWithLean.HeineBorel.lemmas
+
+open Simple
 
 theorem Icc_Compact_R (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
 /-
@@ -9,8 +12,11 @@ Mathlib results used:
   • Set.mem_iUnion : proves that something is in a union iff it is in one of the sets the union is over. Happy to use without justification
 -/
   rw [isCompact_iff_finite_subcover]
+
   intros I U hUopen hcover
+
   let A : Set ℝ := {x ∈ Set.Icc a b | ∃ (t : Finset I), Set.Icc a x ⊆ ⋃ i ∈ t, U i}
+
   have haInA : a ∈ A := by
     simp [A] -- note: uses Set.mem_sep_iff, Set.mem_Icc
 
