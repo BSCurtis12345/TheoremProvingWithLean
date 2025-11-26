@@ -13,8 +13,7 @@ Next we consider the function toFun (our norm), and add the parameters of a norm
 Finally we simplify the code so we can simply use N as our norm.
 -/
 
-set_option linter.style.commandStart false
-set_option diagnostics true
+
 
 abbrev Rn (n : ℕ) := Fin n → ℝ
 variable {n : ℕ}
