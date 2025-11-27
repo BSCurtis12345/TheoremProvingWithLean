@@ -65,6 +65,7 @@ Mathlib results used:
     sorry -- do this later
 
   have hfinCoverε : ∃ (t : Finset I), Set.Ico a (sSup A + ε) ⊆ ⋃ i ∈ t, U i := by
+  -- Proves that [a, sup A + ε) is finitely coverable
     rw [← hunion]
     have ht₁ : ∃ (t₁ : Finset I), Set.Icc a x ⊆ ⋃ i ∈ t₁, U i := by
       exact hx.1.2
@@ -81,7 +82,7 @@ Mathlib results used:
 
 
 
-    let T : Finset I := t₁ ∪ t₂
+    let T : Finset I := t₁ ∪ t₂ -- why doesnt this work???
     --#check t₁
     --#check t₂
     --#check t₁ ∪ t₂
