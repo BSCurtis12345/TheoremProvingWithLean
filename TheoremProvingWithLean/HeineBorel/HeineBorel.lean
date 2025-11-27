@@ -63,3 +63,27 @@ Mathlib results used:
   have hunion : Set.Icc a x ∪ Set.Ioo (sSup A - ε) (sSup A + ε) = Set.Ico a (sSup A + ε) := by
   -- Proves [a,x] ∪ (sup A - ε, sup A + ε) = [a, sup A + ε)
     sorry -- do this later
+
+  have hfinCoverε : ∃ (t : Finset I), Set.Ico a (sSup A + ε) ⊆ ⋃ i ∈ t, U i := by
+    rw [← hunion]
+    have ht₁ : ∃ (t₁ : Finset I), Set.Icc a x ⊆ ⋃ i ∈ t₁, U i := by
+      exact hx.1.2
+    have ht₂ : ∃ (t₂ : Finset I), Set.Ioo (sSup A - ε) (sSup A + ε) ⊆ ⋃ i ∈ t₂, U i := by
+      let J : Finset I := {j}
+      use J
+      intros y hy
+      apply hε.2 at hy
+      have : j ∈ J := by simp [J]
+      exact Set.mem_biUnion this hy
+
+    obtain ⟨t₁, ht₁⟩ := ht₁  -- inside the above proof probably need to obtain witnesses anyway so no need for the subproofs or this line
+    obtain ⟨t₂, ht₂⟩ := ht₂
+
+
+
+    let T : Finset I := t₁ ∪ t₂
+    --#check t₁
+    --#check t₂
+    --#check t₁ ∪ t₂
+
+    --refine ⟨t₁ ∪ t₂, _⟩

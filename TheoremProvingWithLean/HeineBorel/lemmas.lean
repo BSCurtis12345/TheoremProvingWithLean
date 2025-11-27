@@ -11,7 +11,6 @@ lemma elt_in_cover_elt -- this may be an unnecessary lemma
 /-
 Proves that if s ∈ S ⊆ ∪ (i ∈ ι) U i, then ∃ i ∈ ι such that s ∈ U i.
 -/
-
   have hsCover : s ∈ ⋃ i, U i := by -- this can definitely be made shorter
     apply hcover
     exact hs
