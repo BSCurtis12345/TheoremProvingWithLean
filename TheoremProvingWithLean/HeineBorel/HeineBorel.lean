@@ -22,45 +22,26 @@ Mathlib results used:
     intros x hx
     exact hx.1
 
-  have haInA : a ∈ A := by
-  -- Proves a ∈ A
-    simp [A] -- note: uses Set.mem_sep_iff, Set.mem_Icc
-    constructor
-    · exact h
-    · have ha : a ∈ Set.Icc a b := by simpa
-      apply elt_in_cover_elt U hcover a at ha
-      rcases ha with ⟨j, hj⟩
-      let J : Finset I := {j}
-      use J
-      use j
-      simp [J, hj]
+  have haInA : a ∈ A := by exact lower_singleton_Icc_fin_cover h hUopen hcover
+  have hsup : sSup A ∈ Set.Icc a b := by exact sup_subset_Icc_in_Icc ⟨a, haInA⟩ hAsubIcc
 
-  have hsup : sSup A ∈ Set.Icc a b := by
-  -- Proves sup A ∈ [a,b]
-    simp
-    constructor
-    · apply le_csSup
-      apply subset_Icc.bdd_above hAsubIcc
-      exact haInA
-    · apply csSup_le
-      · use a
-      · intros y hy
-        apply hAsubIcc at hy
-        exact hy.2
+  apply in_elt_cover hcover (sSup A) at hsup
 
-  apply elt_in_cover_elt U hcover (sSup A) at hsup -- sup A ∈ U_j for some j
   rcases hsup with ⟨j, hj⟩
   have hcNhd : ∃ ε > 0, Set.Ioo (sSup A - ε) (sSup A + ε) ⊆ U j := by
   -- Proves there is an ε > 0 with (sup A - ε, sup A + ε) ⊆ U_j
     sorry -- show this later (from openness of U j)
+
   rcases hcNhd with ⟨ε, hε⟩
+
   have hx : ∃ x ∈ A, (sSup A - ε) < x := by
   -- Proves there is an x > sup A - ε in A
     apply exists_lt_of_lt_csSup
     · use a
     · simp [hε]
   rcases hx with ⟨x, hx⟩
-  have hunion : Set.Icc a x ∪ Set.Ioo (sSup A - ε) (sSup A + ε) = Set.Ico a (sSup A + ε) := by
+
+  have hunion : Set.Icc a x ∪ Set.Ioo (sSup A - ε) (sSup A + ε) = Set.Ico a (sSup A + ε) := by -- this could be made a separate lemma
   -- Proves [a,x] ∪ (sup A - ε, sup A + ε) = [a, sup A + ε)
     sorry -- do this later
 
@@ -76,15 +57,13 @@ Mathlib results used:
       apply hε.2 at hy
       have : j ∈ J := by simp [J]
       exact Set.mem_biUnion this hy
+    exact union_fin_cover ht₁ ht₂
 
-    obtain ⟨t₁, ht₁⟩ := ht₁  -- inside the above proof probably need to obtain witnesses anyway so no need for the subproofs or this line
-    obtain ⟨t₂, ht₂⟩ := ht₂
+  have hsupEqb : (sSup A) = b := by
+    classical by_contra hneg;
+    apply ne_iff_lt_or_gt.mp at hneg
 
+    cases hneg with
+    | inl hl => sorry -- write a lemma for here that a subset of a finitely covered set has a finite cover of it
 
-
-    let T : Finset I := t₁ ∪ t₂ -- why doesnt this work???
-    --#check t₁
-    --#check t₂
-    --#check t₁ ∪ t₂
-
-    --refine ⟨t₁ ∪ t₂, _⟩
+    | inr hr => sorry
