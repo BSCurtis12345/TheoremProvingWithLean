@@ -1,52 +1,29 @@
 import Mathlib.Algebra.Order.Group.Unbundled.Abs
+--import Mathlib.Order.Defs.LinearOrder
+--import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.Analysis.Normed.MulAction
 import Mathlib.Analysis.Normed.Module.Basic
-import TheoremProvingWithLean.Definitions
 
-open RnNorm
-
-variable {n : ℕ}
-variable (N : RnNorm n) (x : Rn n)
-
+variable {K V : Type*} [NormedField K] [NormedAddCommGroup V] [NormedSpace K V]
 set_option linter.style.longLine false
 
+theorem reverse_triangle_ineq (x y : V) : |‖x‖-‖y‖| ≤ ‖x-y‖ := by
 /-
-variable {K V : Type*} [NormedField K] [NormedAddCommGroup V] [NormedSpace K V]
+This theorem proves the reverse triangle inequality for normed additive commutative groups |‖x‖-‖y‖| ≤ ‖x-y‖.
+
+Mathlib results used :
+  • abs_of_nonneg : proves (0 ≤ a → |a| = a). This is definitional for the absolute value on the reals
+  • norm_add_le : proves the triangle inequality. This is definitional for norms
+  • not_le : proves that in a totally ordered set (¬a ≤ b ↔ b < a). Happy to assume this for our purposes
+  • abs_of_neg: proves (a < 0 → |a| = -a). This is definitional for the absolute value on the reals
 -/
 
-lemma N_sub_swap (x y : Rn n) : N (y - x) = N (x - y) := by
-  have h' : N (-(x - y)) = N (x - y) := by
-    have h := N.homogeneity (-1) (x - y)
-    simpa using h
-  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using h'
-
-
-
-theorem reverse_triangle_ineq (x y : Rn n) : |N x - N y| ≤ N (x - y) := by
-
-  by_cases h : 0 ≤ N x - N y
+  by_cases h : 0 ≤ ‖x‖-‖y‖
   · apply abs_of_nonneg at h
     rw [h]
-    -- Goal prive that N x + N y ≤ N(x + y), by using triangle inequality on x = (x - y) + y
-    have hx: N x ≤ N (x - y) + N y := by
-      have := N.triangle (x-y) y
-      simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this
-    have hx' : N x - N y ≤ N (x - y) := by
-      exact (sub_le_iff_le_add).2 hx
-
-    exact hx'
-
+    simpa using norm_add_le (x-y) y
   · apply not_le.mp at h
     apply abs_of_neg at h
     simp at h
-    rw [h]
-    have hx: N y ≤ N (y - x) + N x := by
-      have := N.triangle (y - x) x
-      simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using this
-    have hx' : N y - N x ≤ N (y - x) := by
-      exact (sub_le_iff_le_add).2 hx
-
-    have hx'' : N y - N x ≤ N (x - y) := by
-      simpa [N_sub_swap] using hx'
-
-    exact hx''
+    rw [h, norm_sub_rev] -- norm_sub_rev not directly equivalent to anything in the NMT definition of a norm: requires additional proof?
+    simpa using norm_add_le (y-x) x
