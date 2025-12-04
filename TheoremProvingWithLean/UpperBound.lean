@@ -27,10 +27,12 @@ lemma Seminorm_sum_le_finite {n' : ℕ} (N : Seminorm ℝ (Rn n')) :
   by
     classical
     intro n
-    induction' n with n ih
-    · intro Kn
+    induction n with
+    | zero =>
+      intro Kn
       simp
-    · intro Kn
+    | succ n ih =>
+      intro Kn
       have h1 :
         N (∑ (i : Fin (n+1)), Kn i) ≤ N (Kn 0) + N (∑ i : Fin n, Kn i.succ) := by
         have := N.add_le' (Kn 0) (∑ i : Fin n, Kn i.succ)
@@ -46,7 +48,6 @@ lemma Seminorm_sum_le_finite {n' : ℕ} (N : Seminorm ℝ (Rn n')) :
       have h3 :
         N (∑ i : Fin (n+1), Kn i) ≤ N (Kn 0) + ∑ i : Fin n, N (Kn i.succ) :=
         le_trans h1 h2'
-
       simpa [Fin.sum_univ_succ] using h3
 
 lemma Finite_Norm_Homogeneity {n : ℕ} {n' : ℕ} (N : Seminorm ℝ (Rn n'))
