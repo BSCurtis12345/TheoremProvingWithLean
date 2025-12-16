@@ -1,6 +1,7 @@
 import Mathlib -- will specify correct folders later
 open scoped BigOperators
 
+namespace UpperBound
 
 abbrev Rn (n : ℕ) := Fin n → ℝ
 noncomputable def e (n : ℕ) (i : Fin n) : Rn n := Pi.basisFun ℝ (Fin n) i
@@ -142,3 +143,5 @@ theorem Upper_Bound (n : ℕ) (N : Seminorm ℝ (Rn n))
     simpa [C, mul_comm] using h
   rw [final_equality.symm]
   exact h_sum
+
+end UpperBound
