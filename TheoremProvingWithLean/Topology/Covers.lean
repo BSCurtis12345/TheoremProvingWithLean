@@ -1,4 +1,9 @@
-import Mathlib -- refine imports later
+--import Mathlib -- refine imports later
+import Mathlib.Data.Set.Defs
+import Mathlib.Order.SetNotation
+import Mathlib.Data.Finset.Defs
+import Mathlib.Data.Finset.Lattice.Union
+import Mathlib.Data.Set.Basic
 
 set_option linter.style.longLine false
 

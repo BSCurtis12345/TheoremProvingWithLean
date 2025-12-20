@@ -1,8 +1,11 @@
-import Mathlib -- will specify imports later
+--import Mathlib -- will specify imports later
+import Mathlib.Order.ConditionallyCompleteLattice.Basic
+import Mathlib.Topology.Compactness.Compact
 import TheoremProvingWithLean.Topology.Covers
 import TheoremProvingWithLean.Topology.OpenSets
 
 set_option linter.style.longLine false
+set_option linter.flexible false
 
 section Icc_basic
 
@@ -40,6 +43,10 @@ variable {ι : Type u} {U : ι → Set ℝ} {a b : ℝ}
 lemma lower_singleton_Icc_fin_cover
   (h : a ≤ b) (hcover : Set.Icc a b ⊆ ⋃ i, U i) :
   a ∈ {x ∈ Set.Icc a b | ∃ (t : Finset ι), Set.Icc a x ⊆ ⋃ i ∈ t, U i} := by
+  /-
+  Proves that if [a,b] covered by U, then a ∈ {x ∈ [a,b] : [a,x] is covered by a finite subcover of U}.
+  (Basically that the singleton {a} can be finitely covered but in the form we want for later).
+  -/
   simp
   constructor
   · exact h
@@ -55,7 +62,7 @@ lemma lower_singleton_Icc_fin_cover
 end Icc_finCover
 
 
-theorem Icc_Compact_R (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
+theorem Icc_compact (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
 /-
 This theorem proves that every (non-degenerate) closed interval in R is compact (with the usual topology).
 
