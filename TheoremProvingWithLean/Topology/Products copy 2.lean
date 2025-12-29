@@ -68,7 +68,7 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
         | ⟨m+1, hk⟩ => w ⟨m, Nat.lt_of_succ_lt_succ hk⟩
     -- Define a function that glues some x ∈ X to w ∈ Xⁿ
 
-    have hnhd_fin_cover : ∀ x ∈ K, ∃ 𝓝ₓ ∈ nhds x, (
+    have hnhd_fin_cover : ∀ x ∈ K, ∃ (𝓝ₓ : Set X), ( (IsOpen 𝓝ₓ) ∧
       (∃ (t : Finset I), (f_prod glue) '' (𝓝ₓ ×ˢ {v : Fin n → X | ∀ i, v i ∈ K})
         ⊆ ⋃ i ∈ t, U i)) := by
     -- For x ∈ K, ∃ an open neighbourhoud 𝓝(x) ⊆ K s.t. 𝓝(x)×Kⁿ can be covered by a finite subfamily of U
@@ -102,7 +102,7 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
       if hx : x ∈ K then (hnhd_fin_cover x hx).choose else ∅
     -- Defines a choice function that takes an x ∈ X to a neighbourhood of x s.t. N(x)×Kⁿ is finitely coverable
 
-    have hN : ∀ x ∈ K, N x ∈ nhds x ∧ (∃ (t : Finset I), (f_prod glue) '' (N x ×ˢ {v : Fin n → X | ∀ i, v i ∈ K})
+    have hN : ∀ x ∈ K, IsOpen (N x) ∧ (∃ (t : Finset I), (f_prod glue) '' (N x ×ˢ {v : Fin n → X | ∀ i, v i ∈ K})
       ⊆ ⋃ i ∈ t, U i) := by
       intro x hx
       simp only [N, hx]
