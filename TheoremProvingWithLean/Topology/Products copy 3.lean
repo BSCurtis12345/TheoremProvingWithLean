@@ -4,6 +4,11 @@ import TheoremProvingWithLean.Topology.Covers
 set_option linter.flexible false
 set_option linter.style.longLine false
 
+/-
+Potential code cleaning:
+· Change to use Set.univ.pi instead of annoying definitions
+-/
+
 open Covers
 
 variable {X : Type} [TopologicalSpace X]
@@ -17,7 +22,7 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
 
   classical
   intro n
-  #check TopologicalSpace (Fin n → X)
+  --#check TopologicalSpace (Fin n → X)
   induction n with
   -- Prove by induction on n
   | zero => -- Base case : n = 0
@@ -70,7 +75,7 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
         | ⟨m+1, hk⟩ => w ⟨m, Nat.lt_of_succ_lt_succ hk⟩
     -- Define a function that glues some x ∈ X to w ∈ Xⁿ
 
-    have hnhd_fin_cover : ∀ x ∈ K, ∃ (𝓝ₓ : Set X), ( (IsOpen 𝓝ₓ) ∧
+    have hnhd_fin_cover : ∀ x ∈ K, ∃ (𝓝ₓ : Set X), ( (IsOpen 𝓝ₓ ∧ x ∈ 𝓝ₓ) ∧
       (∃ (t : Finset I), (f_prod glue) '' (𝓝ₓ ×ˢ {v : Fin n → X | ∀ i, v i ∈ K})
         ⊆ ⋃ i ∈ t, U i)) := by
     -- For x ∈ K, ∃ an open neighbourhoud 𝓝(x) ⊆ K s.t. 𝓝(x)×Kⁿ can be covered by a finite subfamily of U
@@ -88,23 +93,167 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
             simp [glue]
             simp at hv; exact hv ⟨m, Nat.lt_of_succ_lt_succ hk⟩
 
-      choose j hj using hglue_in_cover
+      let W := fun v : Fin n → X =>
+        if hv : v ∈ {v : Fin n → X | ∀ i, v i ∈ K} then U (hglue_in_cover v hv).choose
+        else ∅
 
-      have : ∀ v (hv : v ∈ {v : Fin n → X | ∀ i, v i ∈ K}), ∃ Uᵥ ∈ nhds x, ∃ Vᵥ ∈ nhds v,
-        (x,v) ∈ Uᵥ ×ˢ Vᵥ ∧ f_prod glue '' Uᵥ ×ˢ Vᵥ ⊆ U (j v hv) := by
+      have hW : ∀ v ∈ {v : Fin n → X | ∀ i, v i ∈ K}, glue x v ∈ W v := by
         intro v hv
+        simp only [W]
+        simpa [W, hv] using (hglue_in_cover v hv).choose_spec
+
+      have hWopen : ∀ (v : Fin n → X), IsOpen (W v) := by
+        intro v
+        simp only [W]
+        by_cases hv : v ∈ {v | ∀ (i : Fin n), v i ∈ K}
+        · simp [hv, hopen]
+        · simp [hv]
+
+      have hTV : ∀ v ∈ {v : Fin n → X | ∀ i, v i ∈ K}, ∃ Tᵥ, ∃ Vᵥ,
+        IsOpen Tᵥ ∧ IsOpen Vᵥ ∧ (x,v) ∈ Tᵥ ×ˢ Vᵥ ∧ (f_prod glue) '' (Tᵥ ×ˢ Vᵥ) ⊆ W v := by
+
+        intro v hv
+        specialize hWopen v
+        rw [isOpen_pi_iff'] at hWopen -- isOpen_pi_iff' okay?
+        have hWopen' :  glue x v ∈ W v → ∃ u, (∀ (a : Fin (n + 1)), IsOpen (u a) ∧ glue x v a ∈ u a) ∧ Set.univ.pi u ⊆ W v := hWopen (glue x v)
+        --specialize hWopen (glue x v)
+        replace hWopen' : ∃ u, (∀ (a : Fin (n + 1)), IsOpen (u a) ∧ glue x v a ∈ u a) ∧ Set.univ.pi u ⊆ W v := by
+          exact hWopen' (hW v hv)
+
+        obtain ⟨u, hu⟩ := hWopen'
+        have hu0 : IsOpen (u 0) ∧ glue x v 0 ∈ u 0 := hu.1 0
+        have hu_tail : IsOpen {w : Fin n → X | ∀ (a : Fin n), w a ∈ u a.succ} ∧ tail (glue x v) ∈ {w : Fin n → X | ∀ (a : Fin n), w a ∈ u a.succ} := by
+          constructor
+          · rw [isOpen_pi_iff']
+            intro f hf
+            -- Should be able to use u as witness? With index shifted or something
+            -- Note f ∈ W v → tail f ∈ {...} and vice versa?
+            let u_tail : (Fin n) → Set X :=
+              fun i => u i.succ
+            use u_tail
+            constructor
+            · intro a
+              rcases hu with ⟨hu_all, hu_sub⟩
+              refine And.intro ?h_open ?h_mem
+              · have : IsOpen (u a.succ) := (hu_all a.succ).1
+                simp at this
+                exact this
+              · have hf' : ∀ i : Fin n, f i ∈ u i.succ := by
+                  simpa using hf
+                have : f a ∈ u a.succ := hf' a
+                dsimp [u_tail]
+                exact this
+            · intro w hw
+              change ∀ a : Fin n, w a ∈ u a.succ
+              have hw' : ∀ a : Fin n, w a ∈ u_tail a := by
+                simpa [u_tail] using hw
+              intro a
+              simpa [u_tail] using hw' a
+
+          · change ∀ a : Fin n, tail (glue x v) a ∈ u a.succ
+            intro a
+            simp [tail]
+            exact (hu.1 a.succ).2
+
+        use u 0
+        use {w : Fin n → X | ∀ (a : Fin n), w a ∈ u a.succ}
+        refine And.intro hu0.1 ⟨hu_tail.1, ?_⟩
+        constructor
+        · constructor
+          · have : glue x v 0 ∈ u 0 := hu0.2
+            simpa [glue] using this
+          · have : tail (glue x v) ∈ {w | ∀ a : Fin n, w a ∈ u a.succ} := hu_tail.2
+            have hcoords : ∀ a : Fin n, tail (glue x v) a ∈ u a.succ := by
+              simpa using this
+            simpa using hcoords
+        · intro y hy
+          rcases hy with ⟨⟨x', w⟩, hmem, rfl⟩
+          rcases hmem with ⟨hx', hw'⟩
+          have hcoords : ∀ a : Fin n, w a ∈ u a.succ := by
+            simpa using hw'
+          have hpi : f_prod glue (x', w) ∈ Set.univ.pi u := by
+            refine Set.mem_univ_pi.2 ?_
+            intro k
+            refine Fin.cases ?h0 ?_ k
+            · simpa [glue] using hx'
+            · intro i
+              have : w i ∈ u i.succ := hcoords i
+              simpa [glue] using this
+          exact hu.2 hpi
+
+      let V := fun v : Fin n → X =>
+        if hv : v ∈ {w | ∀ (i : Fin n), w i ∈ K} then
+          (hTV v hv).choose_spec.choose
+        else ∅
+
+      let T := fun v : Fin n → X =>
+        if hv : v ∈ {w | ∀ (i : Fin n), w i ∈ K} then
+          (hTV v hv).choose
+        else ∅
+
+      have hV_open_cover : (∀ v, IsOpen (V v)) ∧ {w | ∀ (i : Fin n), w i ∈ K} ⊆ ⋃ v, (V v) := by
+        constructor
+        · intro v
+          by_cases hv : v ∈ {w | ∀ (i : Fin n), w i ∈ K}
+          · simp only [V, hv]
+            exact (hTV v hv).choose_spec.choose_spec.2.1
+          · simp only [V, hv]
+            simp
+        · intro w hw
+          rw [Set.mem_iUnion]
+          use w
+          simp only [V, hw]
+          exact (hTV w hw).choose_spec.choose_spec.2.2.1.2
+
+      have hV_fin_cover : ∃ (t : Finset (Fin n → X)), {w | ∀ (i : Fin n), w i ∈ K} ⊆ ⋃ i ∈ t, V i ∧ ∀ v ∈ t, v ∈ {w : Fin n → X | ∀ (i : Fin n), w i ∈ K} := by
+        have : ∃ (t : Finset (Fin n → X)), {w | ∀ (i : Fin n), w i ∈ K} ⊆ ⋃ i ∈ t, V i := by
+          rw [isCompact_iff_finite_subcover] at ih
+          exact ih V hV_open_cover.1 hV_open_cover.2
+        obtain ⟨t',ht'⟩ := this
+        let t := t'.filter (fun v => v ∈ {w : Fin n → X | ∀ (i : Fin n), w i ∈ K})
+        use t
+        constructor
+        · intro v hv
+          have hv' : ∃ i ∈ t', v ∈ V i := by simpa using (Set.mem_of_mem_of_subset hv ht')
+          obtain ⟨j, hj⟩ := hv'
+          simp; use j
+          refine And.intro ?_ hj.2
+          simp [t]
+          refine And.intro hj.1 ?_
+          by_contra hj_neg
+          replace hj_neg : j ∉ {w | ∀ (i : Fin n), w i ∈ K} := by simpa using hj_neg
+          have hVj_empty : V j = ∅ := by simp only [V, hj_neg]; simp
+          rw [← Set.mem_empty_iff_false v]
+          simpa [hVj_empty] using hj.2
+        · intro v hv
+          exact (Finset.mem_filter.mp (by simpa [t] using hv)).2
+
+      obtain ⟨t, ht⟩ := hV_fin_cover
+
+      use ⋂ i ∈ t, T i
+      constructor
+      · constructor
+        · apply isOpen_biInter_finset
+          intro j hj
+          simp only [T, ht.2 j hj]
+          exact (hTV j (ht.2 j hj)).choose_spec.choose_spec.1
+        · simp
+          intro j hj
+          simp only [T, ht.2 j hj]
+          exact (hTV j (ht.2 j hj)).choose_spec.choose_spec.2.2.1.1
+      · let J (v : Fin n → X) (hv : v ∈ t) : I :=
+          (hglue_in_cover v (ht.2 v hv)).choose
+        -- go from J to a Finset I by taking image of t under it somehow
 
         sorry
 
 
 
-      sorry
-
     let N := fun x : X =>
       if hx : x ∈ K then (hnhd_fin_cover x hx).choose else ∅
     -- Defines a choice function that takes an x ∈ X to a neighbourhood of x s.t. N(x)×Kⁿ is finitely coverable
 
-    have hN : ∀ x ∈ K, IsOpen (N x) ∧ (∃ (t : Finset I), (f_prod glue) '' (N x ×ˢ {v : Fin n → X | ∀ i, v i ∈ K})
+    have hN : ∀ x ∈ K, (IsOpen (N x) ∧ x ∈ N x) ∧ (∃ (t : Finset I), (f_prod glue) '' (N x ×ˢ {v : Fin n → X | ∀ i, v i ∈ K})
       ⊆ ⋃ i ∈ t, U i) := by
       intro x hx
       simp only [N, hx]
