@@ -1,12 +1,16 @@
-import Mathlib
+import Mathlib.Topology.Defs.Filter
+import Mathlib.Topology.Compactness.Compact
+import Mathlib.Topology.Constructions
 import TheoremProvingWithLean.Topology.Covers
 
 set_option linter.flexible false
 set_option linter.style.longLine false
+set_option linter.style.emptyLine false
 
 /-
-Potential code cleaning:
+Potential polishing to be done:
 · Change to use Set.univ.pi instead of annoying definitions
+· Get rid of W inside hnhd_fin_cover and only use J throughout
 -/
 
 open Covers
@@ -27,7 +31,7 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
       This results states that a set S is open in a finite product space iff for each of its elements...
       - Every co-ordinate belongs to an open set in the space of the corresponding co-ordinate
       - The product of these (a "box neighbourhood") open sets is a subset of S
-      This is not ideal to use unjustified since we want to use either a basis or coarsest topology making projections continuous definition.
+      This is not ideal to use unjustified since we want to use either a basis-of-products-of-open-sets or coarsest-topology-making-projections-continuous definition.
       However, from basis definition we get open => box quite simply...
       ...and from the coarsest topology definition we get box => open quite simply.
       Time-permitting, we will come back to this to formalise it ourselves...
@@ -390,7 +394,7 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
     let N := fun x : X =>
       if hx : x ∈ K then (hnhd_fin_cover x hx).choose else ∅
 
-    -- Proves that the cover property of each neighbourhood N(x) given by the choice function holds
+    -- Prove that the cover property of each neighbourhood N(x) given by the choice function holds
     have hN : ∀ x ∈ K, (IsOpen (N x) ∧ x ∈ N x) ∧ (∃ (t : Finset I), (f_prod glue) '' (N x ×ˢ {v : Fin n → X | ∀ i, v i ∈ K})
       ⊆ ⋃ i ∈ t, U i) := by
       intro x hx
@@ -399,7 +403,17 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
 
     have hfin_sub_coverN : ∃ (t : Finset X), K ⊆ ⋃ i ∈ t, N i := by
     -- ∃ a finite subcover of {N(x)}ₓ covering K - follows from compactness
-      sorry
+      apply hK -- Applies compactness of K - need now show that {N(x)}ₓ is an open cover
+      · -- Openness part
+        intro x
+        by_cases hx : x ∈ K
+        · exact (hN x hx).1.1 -- If x ∈ K, N(x) is open by definition
+        · simp [N, hx] -- Otherwise N(x) = ∅ open also
+      · -- Cover part
+        intro x hx
+        simp
+        use x
+        exact (hN x hx).1.2 -- x ∈ N(x) by definition
 
     obtain ⟨t₁, ht₁⟩ := hfin_sub_coverN -- Gives a particular finite subcover
 
@@ -432,7 +446,12 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
 
     have hnhd_fin_cover' : ∀ (x : X), ∃ (t : Finset I), (f_prod glue) '' N x ×ˢ {v : Fin n → X | ∀ i, v i ∈ K} ⊆ ⋃ j ∈ t, U j := by
     -- ∀ x ∈ X, there is a finite subcover of U covering N(x)×Kⁿ
-      sorry
+      intro x
+      by_cases hx : x ∈ K
+      · simp only [N, hx]
+        exact (hnhd_fin_cover x hx).choose_spec.2 -- If x ∈ K result follows from definition of N by hnhd_fin_cover
+      · simp [N, hx] -- Otherwise N(x) = ∅ so the product is empty and trivially covered
+
 
     have hnhd_prod_fin_cover : ∃ (t : Finset I), ⋃ i ∈ t₁, f_prod glue '' N i ×ˢ {v | ∀ (i : Fin n), v i ∈ K} ⊆
       ⋃ j ∈ t, U j := by
@@ -484,7 +503,6 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
         | succ m => -- m = j+1
           simp [glue, f_prod]
           exact hwK ⟨m, Nat.lt_of_succ_lt_succ hj⟩
-
       · intro hv
         simp; simp at hv
         let w (i : Fin n) : X :=
@@ -499,7 +517,6 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
           cases j using Nat.casesOn with
           | zero => simp
           | succ m => simp
-
     refine ⟨t, ?_⟩
     simpa [hglue_eq_Kn] using ht
 
