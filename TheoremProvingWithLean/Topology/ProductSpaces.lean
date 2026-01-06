@@ -26,7 +26,7 @@ theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
   Proves that for any (non-empty) compact K in X, Kⁿ is compact in Xⁿ w.r.t. the product (pi in mathlib) topology.
 
   Mathlib results used:
-  · isCompact_iff_finite_subcover
+  · isCompact_iff_finite_subcover : proves that Mathlib definition for a compact set is equivalent to definition using open coverings
   · isOpen_pi_iff' :
       This results states that a set S is open in a finite product space iff for each of its elements...
       - Every co-ordinate belongs to an open set in the space of the corresponding co-ordinate
