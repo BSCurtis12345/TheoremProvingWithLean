@@ -4,6 +4,7 @@ import TheoremProvingWithLean.Topology.OpenSets
 
 set_option linter.style.longLine false
 set_option linter.flexible false
+set_option linter.style.emptyLine false
 
 section Icc_basic
 
@@ -77,12 +78,23 @@ Mathlib results used:
 
   intros I U hUopen hcover -- Let U be an open cover indexed over I
 
+  by_cases ha_eq_b : a = b
+  -- In the case that a=b, [a,b] = {a}, and a must belong to a cover element, say Uⱼ, so use {Uⱼ} as the finite subcover
+  · have : ∃ j, a ∈ U j := Set.mem_iUnion.mp (hcover (by simpa using h))
+    rcases this with ⟨j, hj⟩
+    use {j}
+    simpa [ha_eq_b] using hj
+
+  -- In the case a ≠ b, then a < b
+  replace h : a < b := lt_of_le_of_ne h ha_eq_b
+
   -- Let A = {x ∈ [a,b] : [a,x] is covered by a finite subcover of U}
   let A : Set ℝ := {x ∈ Set.Icc a b | ∃ (t : Finset I), Set.Icc a x ⊆ ⋃ i ∈ t, U i}
 
   -- Get A ⊆ [a,b]; a ∈ A; sup A ∈ [a,b] for later convenience
   have hA : A ⊆ Set.Icc a b := by intros x hx; exact hx.1
-  have ha : a ∈ A := by exact lower_singleton_Icc_fin_cover h hcover
+  have ha : a ∈ A := by exact lower_singleton_Icc_fin_cover (le_of_lt h) hcover
+
   have hsup : sSup A ∈ Set.Icc a b := by exact sup_subset_in_Icc ⟨a, ha⟩ hA
 
   -- Get sup A ∈ U_i for some i, takes j as the witness to this
@@ -90,17 +102,44 @@ Mathlib results used:
   rcases hsup with ⟨j, hj⟩
 
   -- Take an ε > 0 s.t. (sup A - ε, sup A + ε) ⊆ U_j
-  rcases exists_Ioo_sub_open (hUopen j) hj with ⟨ε, hε⟩
 
   have hδ : ∃ δ > 0, Set.Ioo (sSup A - δ) (sSup A + δ) ⊆ U j ∧ a ≤ sSup A - δ := by
-    let δ := min ((b-a)/2) ε/2
-    have : δ > 0 ∧ δ < ε := by
-      simp [δ, hε.1] -- doesn't work
+    rcases exists_Ioo_sub_open (hUopen j) hj with ⟨ε, hε⟩
+    have : ∃ j, a ∈ U j := Set.mem_iUnion.mp (hcover (by simpa using le_of_lt h))
+    rcases this with ⟨k, hk⟩
+    rcases exists_Ioo_sub_open (hUopen k) hk with ⟨ε', hε'⟩
+    let δ := min (min ((b-a)/2) (ε/2)) (ε'/2)
+    have : δ > 0 ∧ δ < ε ∧ δ < ε' := by simp [δ, hε.1, h, hε'.1]
     have hδ' : a + δ ∈ A := by
       simp [A]
-      sorry
-    sorry
+      constructor
+      · refine And.intro (le_of_lt this.1) ?_
+        have : a+((b-a)/2) ≤ b := by
+          have h' : (b - a) / 2 ≤ b - a :=
+            half_le_self (le_of_lt (sub_pos.mpr h))
+          have := add_le_add_left h' a
+          simpa [add_comm, add_left_comm, add_assoc, add_sub_cancel] using this
+        apply ge_trans this
+        simp [δ]
+      · use {k}
+        simp
+        refine subset_trans ?_ hε'.2
+        intro x hx -- could make this a separate
+        simp; simp at hx
+        refine And.intro (lt_of_lt_of_le ((sub_lt_self a) hε'.1) hx.1) ?_
+        exact lt_of_le_of_lt hx.2 (add_lt_add_right this.2.2 a)
 
+    use δ
+    refine And.intro this.1 ?_
+    constructor
+    · refine subset_trans ?_ hε.2
+      intro x hx; simp; simp at hx -- same as above - could make separate lemma
+      refine And.intro (lt_trans (sub_lt_sub_left this.2.1 (sSup A)) hx.1) ?_
+      exact lt_trans hx.2 (add_lt_add_right this.2.1 (sSup A))
+    · rw [le_sub_iff_add_le]
+      exact le_csSup (subset_Icc_bdd_above hA) hδ'
+
+  rcases hδ with ⟨ε,hε⟩
 
   have hfinCoverε : ∃ (t : Finset I), Set.Ico a (sSup A + ε) ⊆ ⋃ i ∈ t, U i := by
   -- Proves that [a, sup A + ε) is finitely coverable
@@ -128,13 +167,16 @@ Mathlib results used:
           refine And.intro ?_ hy₂.2
           have ha_le : a ≤ sSup A :=
             le_csSup (subset_Icc_bdd_above hA) ha
-          refine le_trans ?_ (le_of_lt hy₂.1)
+          exact le_trans hε.2.2 (le_of_lt hy₂.1)
 
-          sorry
-      · sorry
+      · intro hy
+        simp; simp at hy
+        by_cases hy' : sSup A - ε < y
+        · right; exact And.intro hy' hy.2
+        · simp at hy'; left
+          exact And.intro hy.1 (le_trans hy' (le_of_lt hx.2))
 
-
-      sorry -- do this later
+       -- do this later
     rw [← hunion]
 
     have ht₁ : ∃ (t₁ : Finset I), Set.Icc a x ⊆ ⋃ i ∈ t₁, U i := hx.1.2
@@ -143,7 +185,7 @@ Mathlib results used:
       let J : Finset I := {j}
       use J
       intros y hy
-      apply hε.2 at hy
+      apply hε.2.1 at hy
       have : j ∈ J := by simp [J]
       exact Set.mem_biUnion this hy
     -- [sup A - ε, sup A + ε] is finitely coverable since it is a subset of U_j ∈ U
@@ -169,7 +211,7 @@ Mathlib results used:
 
         apply subset_fin_cover hfinCoverε at this
         -- Then [a, min{...}] is finitely coverable
-        simp [h, this]
+        simp [le_of_lt h, this]
         have : a - ε/2 ≤ a := by apply le_of_lt; simp [hε]
         rw [← sub_le_iff_le_add]
         exact le_csSup_of_le (subset_Icc_bdd_above hA) ha this
@@ -183,7 +225,7 @@ Mathlib results used:
 
     | inr hr => -- Greater than case
       contrapose! hr
-      rw [← csSup_Icc h]
+      rw [← csSup_Icc (le_of_lt h)]
       exact csSup_le_csSup bddAbove_Icc ⟨a, ha⟩ hA
       -- Clearly sup A ≤ b
 
