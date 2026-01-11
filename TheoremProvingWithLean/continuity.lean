@@ -1,6 +1,12 @@
 import TheoremProvingWithLean.UpperBound
 import TheoremProvingWithLean.Norms
-import mathlib
+import Mathlib.Analysis.Seminorm
+import Mathlib.Topology.Defs.Basic
+import Mathlib.Order.Defs.PartialOrder
+import Mathlib.Topology.EMetricSpace.Lipschitz
+import Mathlib.Topology.MetricSpace.Pseudo.Defs
+import Mathlib.Analysis.Normed.Group.Basic
+
 
 abbrev Rn (n : ℕ) := Fin n → ℝ
 
