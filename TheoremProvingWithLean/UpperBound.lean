@@ -1,8 +1,34 @@
-import Mathlib -- will specify correct folders later
+import Init.Prelude
+import Mathlib.LinearAlgebra.StdBasis
+import Mathlib.Analysis.Seminorm
+import Mathlib.Analysis.Normed.Group.Seminorm
+import Mathlib.Data.Nat.Cast.Order.Ring
+import Mathlib.Algebra.Order.Ring.Unbundled.Basic
+import Mathlib.Algebra.Order.Hom.Basic
+import Mathlib.Algebra.Notation.Pi.Basic
+import Init.Data.Fin.Basic
+import Mathlib.Algebra.Group.Defs
+import Mathlib.Algebra.Group.Basic
+import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
+import Mathlib.Order.Defs.PartialOrder
+import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Analysis.Seminorm
+import Mathlib.Algebra.NeZero
+import Init.Data.Order.Lemmas
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Data.Finset.BooleanAlgebra
+import Mathlib.Analysis.Normed.Group.Constructions
+import Mathlib.Algebra.Order.GroupWithZero.Unbundled.Defs
+import Mathlib.Data.Fintype.Defs
+import Mathlib.Algebra.BigOperators.Ring.Finset
+
+
+
 open scoped BigOperators
 
 namespace UpperBound
 
+-- Defining R^n and the standard basis
 abbrev Rn (n : ℕ) := Fin n → ℝ
 noncomputable def e (n : ℕ) (i : Fin n) : Rn n := Pi.basisFun ℝ (Fin n) i
 

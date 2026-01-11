@@ -1,4 +1,10 @@
-import Mathlib
+import Mathlib.Algebra.Order.Group.Unbundled.Abs
+import Mathlib.Analysis.Seminorm
+import Init.Prelude
+import Mathlib.Analysis.Normed.Group.Seminorm
+import Mathlib.Algebra.Order.Sub.Defs
+import Mathlib.Order.Defs.LinearOrder
+import Mathlib.Algebra.Order.Group.Unbundled.Abs
 
 set_option linter.style.longLine false
 
@@ -7,9 +13,11 @@ open scoped BigOperators
 
 namespace Norms
 
+-- Definining the concept of ℝ^n for our project
 abbrev Rn (n : ℕ) := Fin n → ℝ
 
-
+-- We use Mathlibs definition of a Seminorm to represent our Norms. A seminorm is a norm without the property N x = 0 → x = 0
+-- Where this property is required we introduce it as an assumption h_def
 theorem reverse_triangle_ineq {n : ℕ} (x y : Rn n) (N : Seminorm ℝ (Rn n)) :
   |N x- N y| ≤ N (x-y) := by
   /-
