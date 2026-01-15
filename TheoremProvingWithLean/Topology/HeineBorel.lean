@@ -65,7 +65,7 @@ lemma lower_singleton_Icc_fin_cover
 end Icc_finCover
 
 
-theorem Icc_compact (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
+theorem IsCompact_Icc (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
 /-
 This theorem proves that every (non-degenerate) closed interval in R is compact (with the usual topology).
 

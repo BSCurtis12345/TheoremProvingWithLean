@@ -1,4 +1,3 @@
---import Mathlib -- refine imports later
 import Mathlib.Data.Set.Defs
 import Mathlib.Order.SetNotation
 import Mathlib.Data.Finset.Defs

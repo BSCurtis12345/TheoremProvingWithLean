@@ -1,5 +1,7 @@
 import Mathlib
 import TheoremProvingWithLean.Norms
+import TheoremProvingWithLean.Topology.ProductSpaces
+import TheoremProvingWithLean.Topology.HeineBorel
 
 set_option linter.style.longLine false
 set_option linter.flexible false
@@ -10,8 +12,6 @@ abbrev unit_Icc_pow (n : ℕ) := {x : Rn n | ∀ i, x i ∈ Set.Icc (-1) 1}
 abbrev closed_ball_sup (n : ℕ) := {x : Rn n | ‖x‖ ≤ 1}
 
 variable (n : ℕ)
-
-#check (inferInstance : Norm (Rn n))
 
 lemma closed_ball_sup_eq_pow : closed_ball_sup n = unit_Icc_pow n := by
   /-
@@ -39,6 +39,18 @@ lemma closed_ball_sup_eq_pow : closed_ball_sup n = unit_Icc_pow n := by
     specialize hx i
     exact abs_le.mpr hx
 
+  done
+
+open HeineBorel
+
+lemma IsCompact_closed_ball_sup : IsCompact (closed_ball_sup n) := by
+  /-
+  Proves that the closed unit ball in ℝⁿ w.r.t. the supremum norm is compact w.r.t. the product topology.
+  -/
+  rw [closed_ball_sup_eq_pow] -- Rewrite the closed ball as [-1,1]ⁿ
+  apply IsCompact_pow_compact -- Use that a finite power of a compact set is compact theorem
+  · exact IsCompact_Icc (-1) (1) (by simp) -- By theorem, [-1,1] is compact
+  · use 0; simp -- 0 ∈ [-1,1] so [-1,1] is non-empty
   done
 
 

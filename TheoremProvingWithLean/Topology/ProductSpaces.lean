@@ -20,7 +20,7 @@ variable {X : Type} [TopologicalSpace X]
 def f_prod (f : α → β → γ) : α × β → γ :=
   fun p => f p.1 p.2
 
-theorem power_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
+theorem IsCompact_pow_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.Nonempty) :
   ∀ n : ℕ, IsCompact {v : Fin n → X | ∀ i, v i ∈ K} := by
   /-
   Proves that for any (non-empty) compact K in X, Kⁿ is compact in Xⁿ w.r.t. the product (pi in mathlib) topology.
