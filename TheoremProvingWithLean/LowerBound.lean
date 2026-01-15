@@ -40,3 +40,10 @@ lemma closed_ball_sup_eq_pow : closed_ball_sup n = unit_Icc_pow n := by
     exact abs_le.mpr hx
 
   done
+
+
+theorem Lower_Bound (n : ℕ) (N : Seminorm ℝ (Rn n))
+  (h_def : ∀ x : Rn n, N x = 0 ↔ x = 0) (h_dim : 0 < n) :
+  ∃ C > 0, ∀ x : Rn n, c * ‖x‖ ≤ N x :=
+  by
+    sorry
