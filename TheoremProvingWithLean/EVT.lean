@@ -8,6 +8,6 @@ theorem extreme_value_theorem_max
   (f : Rn n → ℝ)
   (hs : IsCompact s)
   (hf : Continuous f) :
-  ∃ x ∈ s, ∀ y ∈ s, f y ≤ f x :=
+  ∃ x ∈ s, ∀ y ∈ s, f y ≥ f x :=
   by
     sorry
