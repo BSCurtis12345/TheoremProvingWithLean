@@ -1,5 +1,6 @@
 import mathlib
 import TheoremProvingWithLean.UpperBound
+import TheoremProvingWithLean.LowerBound
 
 -- Definition of ℝⁿ as functions Fin n → ℝ
 abbrev Rn (n : ℕ) := Fin n → ℝ
@@ -31,10 +32,10 @@ theorem All_Norms_On_Rn_Equivalent
     --------------------------------------------------------------------
     have h3 : (∃ c > 0, ∀ x : Rn n, N x ≥ c * ‖x‖) :=
     by
-      sorry
+      simpa using (LowerBound.Lower_Bound (n := n) (N := N) h_def_N h_dim)
     have h4 : (∃ c > 0, ∀ x : Rn n, M x ≥ c * ‖x‖) :=
     by
-      sorry
+      simpa using (LowerBound.Lower_Bound (n := n) (N := M) h_def_M h_dim)
     --------------------------------------------------------------------
     -- Converting to the following form
     -- (1/C) * N x ≤ ‖x‖
@@ -79,7 +80,6 @@ theorem All_Norms_On_Rn_Equivalent
         simpa [mul_assoc] using (inv_mul_cancel_left₀ hcne ‖x‖)
       -- Rewrite with rhs
       simpa [rhs] using hx'
-
     --------------------------------------------------------------------
     -- Combine h5 and h6 to relate N and M:
     -- (1/C) N x ≤ ‖x‖ ≤ (1/c) M x,
