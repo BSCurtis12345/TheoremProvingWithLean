@@ -47,7 +47,6 @@ theorem continuous_image_compact_def
 open Set
 open scoped Topology
 
-universe u
 variable {α : Type u} [TopologicalSpace α] [T2Space α]
 
 theorem compact_isClosed
@@ -71,10 +70,6 @@ theorem compact_isClosed
 #check compact_isClosed
 
 
-open Set
-open scoped Topology
-
-universe u
 variable {α : Type u} [TopologicalSpace α] [CompactSpace α]
 
 theorem isCompact_of_isClosed_one_layer
@@ -83,7 +78,6 @@ theorem isCompact_of_isClosed_one_layer
 
   refine (@isCompact_iff_finite_subcover _ _ S).2 ?_
   intro ι U hUopen hcover
-
 
   -- Extend to a cover of the whole space
   let V : Option ι → Set α

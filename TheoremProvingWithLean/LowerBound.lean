@@ -5,6 +5,7 @@ import TheoremProvingWithLean.Topology.HeineBorel
 import TheoremProvingWithLean.UpperBound
 import TheoremProvingWithLean.continuity
 import TheoremProvingWithLean.EVT
+import TheoremProvingWithLean.Topology.Compact
 
 set_option linter.style.longLine false
 set_option linter.flexible false
@@ -60,6 +61,13 @@ lemma IsCompact_closed_ball_sup : IsCompact (closed_ball_sup n) := by
   · use 0; simp -- 0 ∈ [-1,1] so [-1,1] is non-empty
   done
 
+lemma IsCompact_closed_sphere_sup : IsCompact (S_infinity n) := by
+  /-
+  Proves that the unit sphere in ℝⁿ w.r.t. the supremum norm is compact.
+  -/
+
+  sorry
+  done
 
 theorem Lower_Bound (n : ℕ) (N : Seminorm ℝ (Rn n))
   (h_def : ∀ x : Rn n, N x = 0 ↔ x = 0) (h_dim : 0 < n) :
