@@ -7,6 +7,7 @@ import Mathlib.Topology.EMetricSpace.Lipschitz
 import Mathlib.Topology.MetricSpace.Pseudo.Defs
 import Mathlib.Analysis.Normed.Group.Basic
 
+namespace Continuity
 -- Coordinate definition of ℝⁿ as functions Fin n → ℝ
 abbrev Rn (n : ℕ) := Fin n → ℝ
 
@@ -15,7 +16,7 @@ abbrev Rn (n : ℕ) := Fin n → ℝ
 --  • the dimension n is positive (we provide these assumptions)
 -- The proof proceeds by showing that the seminorm is Lipschitz,
 -- and then use the fact that Lipschitz maps are continuous.
-lemma seminorm_continuous (n : ℕ) (N : Seminorm ℝ (Rn n))
+lemma norm_continuous (n : ℕ) (N : Seminorm ℝ (Rn n))
   (h_def : ∀ x : Rn n, N x = 0 ↔ x = 0) (h_dim : 0 < n) :
   Continuous (fun x : Rn n => N x) :=
   by
@@ -65,3 +66,4 @@ lemma seminorm_continuous (n : ℕ) (N : Seminorm ℝ (Rn n))
       simpa [Real.dist_eq, dist_eq_norm] using (le_trans h1 h2)
     -- Lipschitz maps between metric spaces are continuous
     exact hLip.continuous
+end Continuity
