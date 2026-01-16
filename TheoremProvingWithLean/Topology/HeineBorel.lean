@@ -69,7 +69,7 @@ theorem IsCompact_Icc (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
 /-
 This theorem proves that every (non-degenerate) closed interval in R is compact (with the usual topology).
 
-Mathlib results used:
+Notable Mathlib results used:
   • isCompact_iff_finite_subcover : proves that Mathlib definition for a compact set is equivalent to definition using open coverings
 -/
   rw [isCompact_iff_finite_subcover] -- Rewrite goal in terms of finite subcover definition

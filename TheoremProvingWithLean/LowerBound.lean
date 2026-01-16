@@ -4,7 +4,7 @@ import TheoremProvingWithLean.Topology.ProductSpaces
 import TheoremProvingWithLean.Topology.HeineBorel
 import TheoremProvingWithLean.UpperBound
 import TheoremProvingWithLean.continuity
-import TheoremProvingWithLean.EVT
+--import TheoremProvingWithLean.EVT
 import TheoremProvingWithLean.Topology.Compact
 
 set_option linter.style.longLine false
@@ -61,12 +61,57 @@ lemma IsCompact_closed_ball_sup : IsCompact (closed_ball_sup n) := by
   · use 0; simp -- 0 ∈ [-1,1] so [-1,1] is non-empty
   done
 
-lemma IsCompact_closed_sphere_sup : IsCompact (S_infinity n) := by
+open Continuity
+
+lemma IsCompact_closed_sphere_sup (hn : 0 < n) : IsCompact (S_infinity n) := by
   /-
   Proves that the unit sphere in ℝⁿ w.r.t. the supremum norm is compact.
+
+  Notable Mathlib results used:
+    • IsClosed.preimage :
+        This states that the preimage under a continuous function of a closed set is closed.
+        We use this for now as it is very close to definition of continuity.
+        Time-permitting, this can be expanded to reduce dependence on Mathlib results further.
   -/
 
-  sorry
+  -- First get that the sphere is a subset of the closed ball
+  have hSub : S_infinity n ⊆ closed_ball_sup n := by
+    intro x hx
+    simp at hx
+    simp [hx]
+
+  -- Refine by isCompact_of_isClosed_subset from Compact file - remains to show that S_infinity is closed
+  refine isCompact_of_isClosed_subset (IsCompact_closed_ball_sup n) ?_ hSub
+
+  -- Get that S_infinity is the preimage of {1} under the sup norm ‖·‖
+  have hPreimage : S_infinity n = (fun x : Rn n => ‖x‖) ⁻¹' {1} := by
+    ext x
+    constructor
+    -- We prove by extensionality - in both cases the hypothesis and goal simplify to ‖x‖=1
+    · intro hx
+      simp at hx; simp [hx]
+    · intro hx
+      simp at hx; simp [hx]
+
+  rw [hPreimage]
+
+  -- We will get that S_infinity is closed given that it is the preimage of a closed set under a continuous function
+  apply IsClosed.preimage
+
+  · -- Prove that ‖·‖ is continuous:
+    -- We will do this by using our lemma norm_continuous
+    -- This works with seminorms with the added definiteness property, so we define a seminorm equivalent to ‖·‖
+    have hdef : ∀ x : Rn n, ‖x‖ = 0 ↔ x = 0 := by simp
+    let supNorm.toSeminorm (n : ℕ) : Seminorm ℝ (Rn n) :=
+    { toFun := fun x => ‖x‖,
+      map_zero' := by simp,
+      smul' := by simp [norm_smul],
+      add_le' := by simp [norm_add_le],
+      neg' := by simp [norm_neg] }
+    exact (norm_continuous n (supNorm.toSeminorm n) hdef hn)
+  · -- Prove that {1} is closed
+    simp
+
   done
 
 theorem Lower_Bound (n : ℕ) (N : Seminorm ℝ (Rn n))

@@ -47,7 +47,6 @@ theorem continuous_image_compact_def
 open Set
 open scoped Topology
 
-universe u
 variable {α : Type u} [TopologicalSpace α] [T2Space α]
 
 theorem compact_isClosed
@@ -71,11 +70,9 @@ theorem compact_isClosed
 #check compact_isClosed
 
 
-
 open Set
 open scoped Topology
 
-universe u
 variable {α : Type u} [TopologicalSpace α]
 
 theorem isCompact_of_isClosed_subset
