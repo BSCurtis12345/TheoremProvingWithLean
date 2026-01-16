@@ -71,35 +71,39 @@ theorem compact_isClosed
 #check compact_isClosed
 
 
+
 open Set
 open scoped Topology
 
 universe u
-variable {α : Type u} [TopologicalSpace α] [CompactSpace α]
+variable {α : Type u} [TopologicalSpace α]
 
-theorem isCompact_of_isClosed_one_layer
-    {S : Set α} (hS : IsClosed S) : IsCompact S := by
+theorem isCompact_of_isClosed_subset
+    {K S : Set α}
+    (hK : IsCompact K)
+    (hS : IsClosed S)
+    (hSK : S ⊆ K) :
+    IsCompact S := by
   classical
 
+  -- Use the open-cover characterisation on S
   refine (@isCompact_iff_finite_subcover _ _ S).2 ?_
   intro ι U hUopen hcover
 
-
-  -- Extend to a cover of the whole space
+  -- Extend the cover of S to a cover of K
   let V : Option ι → Set α
     | some i => U i
     | none   => Sᶜ
 
   have hVopen : ∀ i, IsOpen (V i) := by
     intro i; cases i with
-    | some i =>
-        simpa using hUopen i
+    | some i => simpa using hUopen i
     | none =>
-        change IsOpen Sᶜ
-        simpa using hS.isOpen_compl
+      change IsOpen Sᶜ
+      simpa using hS.isOpen_compl
 
-  have hVcover : (univ : Set α) ⊆ ⋃ i, V i := by
-    intro x hx
+  have hVcover : K ⊆ ⋃ i, V i := by
+    intro x hxK
     by_cases hxS : x ∈ S
     ·
       rcases mem_iUnion.1 (hcover hxS) with ⟨i, hi⟩
@@ -107,25 +111,25 @@ theorem isCompact_of_isClosed_one_layer
     ·
       exact mem_iUnion.2 ⟨none, hxS⟩
 
-  -- Finite subcover of the ambient space
+  -- Compactness of K gives a finite subcover
   obtain ⟨t, ht⟩ :=
-    isCompact_univ.elim_finite_subcover V hVopen hVcover
+    hK.elim_finite_subcover V hVopen hVcover
 
-  -- Use the same finite set, but ignore `none` when covering S
+  -- Remove `none` and restrict back to S
   refine ⟨t.eraseNone, ?_⟩
   intro x hxS
 
-  have : x ∈ ⋃ i ∈ t, V i := ht (by trivial)
+  have hxK : x ∈ K := hSK hxS
+  have : x ∈ ⋃ i ∈ t, V i := ht hxK
+
   rcases mem_iUnion₂.1 this with ⟨i, hi, hxi⟩
   cases i with
   | none =>
-      -- impossible since x ∈ S
       exact (hxi hxS).elim
   | some i =>
-      refine mem_iUnion.2 ?_
-      refine ⟨i, mem_iUnion.2 ?_⟩
+      refine mem_iUnion.2 ⟨i, mem_iUnion.2 ?_⟩
       exact ⟨by
-      simpa [Finset.mem_eraseNone] using hi,
-      hxi⟩
+        simpa [Finset.mem_eraseNone] using hi,
+        hxi⟩
 
-#check isCompact_of_isClosed_one_layer
+#check isCompact_of_isClosed_subset
