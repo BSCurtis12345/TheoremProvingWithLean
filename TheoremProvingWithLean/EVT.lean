@@ -1,4 +1,14 @@
+import Mathlib.Topology.Compactness.Compact
+import Mathlib.Topology.Separation.Hausdorff
+import Mathlib.Data.Finset.Option
+
+import Mathlib.Topology.Compactness.Compact
+import Mathlib.Topology.Separation.Hausdorff
+
+
 import Mathlib
+
+
 
 namespace EVT
 
