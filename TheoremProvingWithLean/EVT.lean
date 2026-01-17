@@ -1,9 +1,4 @@
-import Mathlib.Analysis.Real.Basic
-import Mathlib.Topology.Compactness.Compact
-import Mathlib.Topology.Separation.Hausdorff
-
-import TheoremProvingWithLean.Topology.CompactImage
-import TheoremProvingWithLean.Topology.CompactClosed
+import Mathlib
 
 namespace EVT
 
@@ -14,61 +9,75 @@ theorem extreme_value_theorem_min
   (s : Set (Rn n))
   (f : Rn n → ℝ)
   (hs : IsCompact s)
+  (hs_nonempty : s.Nonempty)
   (hf : Continuous f) :
   ∃ x ∈ s, ∀ y ∈ s, f y ≥ f x :=
-  by
-    classical
+by
+  classical
 
-    ------------------------------------------------------------------
-    -- Step 1: continuous image of a compact set is compact (your lemma)
-    ------------------------------------------------------------------
-    have hImgCompact : IsCompact (f '' s) :=
-      continuous_image_compact_def hs hf
+  ----------------------------------------------------------------
+  -- STEP 1: define g = -f
+  ----------------------------------------------------------------
+  let g : Rn n → ℝ := fun x => -f x
+  have hg_cont : Continuous g := hf.neg
 
-    ------------------------------------------------------------------
-    -- Step 2: Heine–Borel consequence:
-    -- compact subsets of ℝ are closed
-    ------------------------------------------------------------------
-    have hImgClosed : IsClosed (f '' s) :=
-      compact_isClosed hImgCompact
+  ----------------------------------------------------------------
+  -- STEP 2: image of compact set is compact (YOUR lemma)
+  ----------------------------------------------------------------
+  have hcomp : IsCompact (g '' s) :=
+    continuous_image_compact_def hs hg_cont
 
-    ------------------------------------------------------------------
-    -- Step 3: compact subsets of ℝ are bounded below
-    ------------------------------------------------------------------
-    have hImgBddBelow : BddBelow (f '' s) :=
-      hImgCompact.bddBelow
+  ----------------------------------------------------------------
+  -- STEP 3: compact subset of ℝ is closed and bounded
+  ----------------------------------------------------------------
+  have hclosed : IsClosed (g '' s) := hcomp.isClosed
+  have hbounded : BddAbove (g '' s) := hcomp.bddAbove
 
-    ------------------------------------------------------------------
-    -- Step 4: non-emptiness (from compactness of s)
-    ------------------------------------------------------------------
-    obtain ⟨x₀, hx₀⟩ := hs.nonempty
-    have hNonempty : (f '' s).Nonempty :=
-      ⟨f x₀, ⟨x₀, hx₀, rfl⟩⟩
+  --have hcb : IsClosed (g '' s) ∧ BddAbove (g '' s) :=
+  --HeineBorel.compact_closed_bounded (g '' s) hcomp
+  --have hclosed : IsClosed (g '' s) := hcb.1
+  --have hbounded : BddAbove (g '' s) := hcb.2
 
-    ------------------------------------------------------------------
-    -- Step 5: define the minimum value
-    ------------------------------------------------------------------
-    let m := sInf (f '' s)
+  have hne : (g '' s).Nonempty :=
+    hs_nonempty.image g
 
-    ------------------------------------------------------------------
-    -- Step 6: closed + bounded ⇒ infimum is attained
-    ------------------------------------------------------------------
-    have hm_mem : m ∈ f '' s :=
-      hImgClosed.mem_of_inf_mem hNonempty hImgBddBelow
+  ----------------------------------------------------------------
+  -- STEP 4: define the supremum
+  ----------------------------------------------------------------
+  let m : ℝ := sSup (g '' s)
 
-    ------------------------------------------------------------------
-    -- Step 7: pull minimiser back to s
-    ------------------------------------------------------------------
-    rcases hm_mem with ⟨x, hxS, hfx⟩
-    refine ⟨x, hxS, ?_⟩
+  ----------------------------------------------------------------
+  -- STEP 5: supremum is IN the set (closedness!)
+  ----------------------------------------------------------------
+  have hm_mem : m ∈ g '' s :=
+    hclosed.csSup_mem hne hbounded
 
-    ------------------------------------------------------------------
-    -- Step 8: minimality
-    ------------------------------------------------------------------
-    intro y hy
-    have : m ≤ f y :=
-      csInf_le hImgBddBelow ⟨y, hy, rfl⟩
-    linarith
+  ----------------------------------------------------------------
+  -- STEP 6: unpack the witness x ∈ s
+  ----------------------------------------------------------------
+  --rcases hm_mem with ⟨x, hx_s, rfl⟩
+  rcases hm_mem with ⟨x, hx_s, hx_eq⟩
+
+  ----------------------------------------------------------------
+  -- STEP 7: show minimality
+  ----------------------------------------------------------------
+  refine ⟨x, hx_s, ?_⟩
+  intro y hy_s
+
+  -- y is in the image
+  have hy : g y ∈ g '' s := ⟨y, hy_s, rfl⟩
+
+  -- element ≤ supremum
+  have hgy_le_sup : g y ≤ sSup (g '' s) :=
+    le_csSup hbounded hy
+
+  -- rewrite supremum as g x
+  have hgy_le_gx : g y ≤ g x := by
+    simpa [hx_eq] using hgy_le_sup
+
+  -- translate back to f
+  dsimp [g] at hgy_le_gx
+  linarith
 
 
 end EVT
