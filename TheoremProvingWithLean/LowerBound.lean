@@ -4,7 +4,7 @@ import TheoremProvingWithLean.Topology.ProductSpaces
 import TheoremProvingWithLean.Topology.HeineBorel
 import TheoremProvingWithLean.UpperBound
 import TheoremProvingWithLean.continuity
---import TheoremProvingWithLean.EVT
+import TheoremProvingWithLean.EVT
 import TheoremProvingWithLean.Topology.Compact
 
 set_option linter.style.longLine false
@@ -121,7 +121,7 @@ theorem Lower_Bound (n : ℕ) (N : Seminorm ℝ (Rn n))
     classical
     have hS_compact : IsCompact (S_infinity n) :=
     by
-      sorry
+      exact IsCompact_closed_sphere_sup (n := n) h_dim
     have hN_cont : Continuous (fun x : Rn n => (N x : ℝ)) :=
     by
       exact Continuity.norm_continuous n N h_def h_dim
