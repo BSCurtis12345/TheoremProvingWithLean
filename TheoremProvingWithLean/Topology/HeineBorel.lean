@@ -8,6 +8,9 @@ set_option linter.style.emptyLine false
 
 namespace HeineBorel
 
+abbrev Rn (n : ℕ) := Fin n → ℝ
+
+
 lemma subset_Icc_bdd_above {a b : ℝ} {S : Set ℝ} (h : S ⊆ Set.Icc a b) : BddAbove S := by
 /-
 Proves that a subset of a closed interval in ℝ is bounded above.
@@ -251,5 +254,11 @@ Mathlib results used:
   have : b < b + ε := by simp [hε]
   exact subset_fin_cover hfinCoverε (Set.Icc_subset_Ico_right this)
   done
+
+lemma compact_implies_bounded (n : ℕ) (s : Set (Rn n)) :
+  IsCompact s → Bornology.IsBounded s :=
+  by
+    intro hs
+    exact hs.isBounded  
 
 end HeineBorel
