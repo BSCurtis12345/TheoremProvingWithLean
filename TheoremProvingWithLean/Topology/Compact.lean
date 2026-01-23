@@ -68,13 +68,15 @@ theorem compact_isClosed
 
 #check compact_isClosed
 
+
+/-
 theorem compact_isClosed_notfromMathlib
 --proof in a hausdorff space K (we prove for R specifically) then compact set in K implies closed without using hk.isClosed
     {K : Set α} (hK : IsCompact K) : IsClosed K := by
   -- A set is closed if its complement is open
   -- We will show that for any point x not in K, there is an open neighborhood around x that does not intersect K
   have h : IsClosed K := by
-    rw isClosed_iff_nhds
+    rw [isClosed_iff_nhds]
     intro x hxKc
     -- For each point y in K, we can find disjoint open neighborhoods around x and y
     let U := ⋃ (y ∈ K), (nhds x).filter (fun V => V ∩ (nhds y).nonempty)
@@ -94,7 +96,7 @@ theorem compact_isClosed_notfromMathlib
     exact ⟨U, hUopen, by simp [hUcapK]⟩
 
   exact h
-
+-/
 
 
 open Set

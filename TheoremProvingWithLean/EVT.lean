@@ -6,8 +6,8 @@ import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Separation.Hausdorff
 import TheoremProvingWithLean.Topology.Compact
 
-import TheoremProvingWithLean.Topology.Compact.ContinuousImageCompact
-import TheoremProvingWithLean.Topology.Compact.HeineBorel
+--import TheoremProvingWithLean.Topology.Compact.ContinuousImageCompact
+--import TheoremProvingWithLean.Topology.Compact.HeineBorel
 
 import Mathlib
 
