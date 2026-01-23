@@ -6,6 +6,8 @@ import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Separation.Hausdorff
 import TheoremProvingWithLean.Topology.Compact
 
+import TheoremProvingWithLean.Topology.Compact.ContinuousImageCompact
+import TheoremProvingWithLean.Topology.Compact.HeineBorel
 
 import Mathlib
 
@@ -26,21 +28,15 @@ theorem extreme_value_theorem_min
 by
   classical
 
-  ----------------------------------------------------------------
-  -- STEP 1: define g = -f
-  ----------------------------------------------------------------
+  -- define g = -f
   let g : Rn n → ℝ := fun x => -f x
   have hg_cont : Continuous g := hf.neg
 
-  ----------------------------------------------------------------
-  -- STEP 2: image of compact set is compact (YOUR lemma)
-  ----------------------------------------------------------------
+  -- image of compact set is compact, imported from Topology.Compact.ContinuousImageCompact
   have hcomp : IsCompact (g '' s) :=
     continuous_image_compact_def hs hg_cont
 
-  ----------------------------------------------------------------
-  -- STEP 3: compact subset of ℝ is closed and bounded
-  ----------------------------------------------------------------
+  -- compact subset of R is closed and bounded
   have hclosed : IsClosed (g '' s) := hcomp.isClosed
   have hbounded : BddAbove (g '' s) := hcomp.bddAbove
 
@@ -52,33 +48,24 @@ by
   have hne : (g '' s).Nonempty :=
     hs_nonempty.image g
 
-  ----------------------------------------------------------------
-  -- STEP 4: define the supremum
-  ----------------------------------------------------------------
+  -- define the sup
   let m : ℝ := sSup (g '' s)
 
-  ----------------------------------------------------------------
-  -- STEP 5: supremum is IN the set (closedness!)
-  ----------------------------------------------------------------
+  -- supremum in the set
   have hm_mem : m ∈ g '' s :=
     hclosed.csSup_mem hne hbounded
 
-  ----------------------------------------------------------------
-  -- STEP 6: unpack the witness x ∈ s
-  ----------------------------------------------------------------
-  --rcases hm_mem with ⟨x, hx_s, rfl⟩
+  -- unpack x ∈ s
   rcases hm_mem with ⟨x, hx_s, hx_eq⟩
 
-  ----------------------------------------------------------------
-  -- STEP 7: show minimality
-  ----------------------------------------------------------------
+  -- show minimality
   refine ⟨x, hx_s, ?_⟩
   intro y hy_s
 
   -- y is in the image
   have hy : g y ∈ g '' s := ⟨y, hy_s, rfl⟩
 
-  -- element ≤ supremum
+  -- element <= supremum
   have hgy_le_sup : g y ≤ sSup (g '' s) :=
     le_csSup hbounded hy
 
