@@ -2,11 +2,10 @@ import mathlib
 import TheoremProvingWithLean.Norms
 import TheoremProvingWithLean.Topology.ProductSpaces
 import TheoremProvingWithLean.Topology.HeineBorel
+import TheoremProvingWithLean.Topology.Compact
 import TheoremProvingWithLean.UpperBound
 import TheoremProvingWithLean.continuity
 import TheoremProvingWithLean.EVT
-import TheoremProvingWithLean.UpperBound
-import TheoremProvingWithLean.Topology.Compact
 
 set_option linter.style.longLine false
 set_option linter.flexible false
@@ -51,6 +50,7 @@ lemma closed_ball_sup_eq_pow : closed_ball_sup n = unit_Icc_pow n := by
   done
 
 open HeineBorel
+open ProductSpaces
 
 lemma IsCompact_closed_ball_sup : IsCompact (closed_ball_sup n) := by
   /-

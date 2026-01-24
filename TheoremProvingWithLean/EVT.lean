@@ -1,17 +1,11 @@
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Separation.Hausdorff
 import Mathlib.Data.Finset.Option
-
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Separation.Hausdorff
 import TheoremProvingWithLean.Topology.Compact
 
---import TheoremProvingWithLean.Topology.Compact.ContinuousImageCompact
---import TheoremProvingWithLean.Topology.Compact.HeineBorel
-
 import Mathlib
-
-
 
 namespace EVT
 
@@ -76,7 +70,6 @@ by
   -- translate back to f
   dsimp [g] at hgy_le_gx
   linarith
-
 
 end EVT
 

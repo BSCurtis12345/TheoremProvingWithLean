@@ -1,6 +1,8 @@
 import Mathlib.Topology.Compactness.Compact
+import Mathlib.Order.Interval.Set.Defs
+import Mathlib.Topology.MetricSpace.Pseudo.Defs
 import TheoremProvingWithLean.Topology.Covers
-import TheoremProvingWithLean.Topology.OpenSets
+--import TheoremProvingWithLean.Topology.OpenSets
 
 set_option linter.style.longLine false
 set_option linter.flexible false
@@ -9,7 +11,6 @@ set_option linter.style.emptyLine false
 namespace HeineBorel
 
 abbrev Rn (n : ℕ) := Fin n → ℝ
-
 
 lemma subset_Icc_bdd_above {a b : ℝ} {S : Set ℝ} (h : S ⊆ Set.Icc a b) : BddAbove S := by
 /-
@@ -35,6 +36,20 @@ Proves that if ∅ ≠ S ⊆ [a,b], then sup S ∈ [a,b].
     intros c hc; exact (hsub hc).2
   done
 
+lemma exists_Ioo_sub_open {U : Set ℝ} {x : ℝ} (hUopen : IsOpen U) (hx : x ∈ U) :
+  ∃ ε > 0, Set.Ioo (x-ε) (x+ε) ⊆ U := by
+/-
+Proves that if x ∈ U ⊆ ℝ, U open, then ∃ ε > 0 s.t. (x-ε,x+ε).
+This result is essentially the definition of what makes a set open in the standard topology on ℝ.
+Thus we use Metric.isOpen_iff to do most the work here.
+-/
+  rw [Metric.isOpen_iff] at hUopen
+  specialize hUopen x hx
+  obtain ⟨ε, hε⟩ := hUopen
+  use ε
+  rw [← Real.ball_eq_Ioo x ε]
+  exact hε
+  done
 
 open Covers
 
@@ -72,7 +87,7 @@ theorem IsCompact_Icc (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
 /-
 This theorem proves that every (non-degenerate) closed interval in R is compact (with the usual topology).
 
-Mathlib results used:
+Notable Mathlib results used:
   • isCompact_iff_finite_subcover : proves that Mathlib definition for a compact set is equivalent to definition using open coverings
 -/
   rw [isCompact_iff_finite_subcover] -- Rewrite goal in terms of finite subcover definition

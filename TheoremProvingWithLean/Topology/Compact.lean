@@ -5,6 +5,8 @@ import Mathlib.Data.Finset.Option
 open Set
 open scoped Topology
 
+set_option linter.style.emptyLine false
+
 universe u v w
 variable {α : Type u} {β : Type v} [TopologicalSpace α] [TopologicalSpace β]
 variable {s : Set α} {f : α → β}
