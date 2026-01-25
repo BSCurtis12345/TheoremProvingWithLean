@@ -270,7 +270,7 @@ Notable Mathlib results used:
   exact subset_fin_cover hfinCoverε (Set.Icc_subset_Ico_right this)
   done
 
-lemma compact_implies_bounded (n : ℕ) (s : Set ℝ) (hs : IsCompact s) :
+lemma compact_implies_bounded (s : Set ℝ) (hs : IsCompact s) :
   ∃ R : ℝ, ∀ x, x ∈ s → |x| ≤ R :=
   by
     -- We will cover s by open balls centred at 0 with radii (n : ℝ) + 1
