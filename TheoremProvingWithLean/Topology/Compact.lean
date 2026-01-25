@@ -50,7 +50,7 @@ open scoped Topology
 
 variable {α : Type u} [TopologicalSpace α] [T2Space α]
 
-theorem compact_isClosed
+theorem compact_implies_closed
     {K : Set α} (hK : IsCompact K) : IsClosed K := by
   -- A set is closed if its complement is open
   -- The complement of a compact set is open in a Hausdorff space
