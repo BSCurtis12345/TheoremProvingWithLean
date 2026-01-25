@@ -1,6 +1,10 @@
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Separation.Hausdorff
 import Mathlib.Data.Finset.Option
+import Mathlib.Data.Real.Basic
+import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Topology.Order.Basic
+import Mathlib.Topology.Sequences
 
 open Set
 open scoped Topology
@@ -47,58 +51,98 @@ theorem continuous_image_compact_def
 
 open Set
 open scoped Topology
+open Filter
 
 variable {α : Type u} [TopologicalSpace α] [T2Space α]
 
-theorem compact_implies_closed
-    {K : Set α} (hK : IsCompact K) : IsClosed K := by
-  -- A set is closed if its complement is open
-  -- The complement of a compact set is open in a Hausdorff space
-  have h : IsClosed K := hK.isClosed
-  exact h
+theorem compact_implies_closed {K : Set ℝ} (hK : IsCompact K) : IsClosed K := by
+  classical
+  by_contra hClosed
 
--- We stop the expansion here.
--- In mathlib, the fact that compact subsets of Hausdorff spaces are closed
--- is already formalised as `IsCompact.isClosed`.
--- Re-deriving the open-cover / separation argument would require
--- substantial additional infrastructure (filters, finite subcovers, choice),
--- and is orthogonal to the goal of this development.
+  -- From ¬IsClosed K, we get ¬(closure K ⊆ K)
+  have h_not_closure : ¬ closure K ⊆ K := by
+    intro hsub
+    -- If closure K ⊆ K then closure K = K
+    have hEq : closure K = K := subset_antisymm hsub subset_closure
+    -- But closure K is closed so K is closed
+    have hKclosed : IsClosed K := by
+      simpa [hEq] using (isClosed_closure : IsClosed (closure K))
+    exact hClosed hKclosed
 
---“compact ⇒ complement open”
---“compact ⇒ contains cluster points”
---Those are internal to IsCompact.isClosed
+  -- from ¬(closure K ⊆ K) get x ∈ closure K \ K
+  have hx_exists : ∃ x, x ∈ closure K ∧ x ∉ K := by
+    simpa [Set.subset_def] using h_not_closure
+  rcases hx_exists with ⟨x, hx_closure, hx_notin⟩
 
-#check compact_isClosed
+  -- from x ∈ closure K we build a sequence y n ∈ K with dist < 1/(n+1)
+
+  have hx_closure' :
+      ∀ ε : ℝ, 0 < ε → ∃ y, y ∈ K ∧ dist y x < ε := by
+    intro ε hε
+    have hx' : ∀ ε : ℝ, 0 < ε → ∃ b ∈ K, dist x b < ε := by
+      have : x ∈ closure K ↔ ∀ ε : ℝ, 0 < ε → ∃ b ∈ K, dist x b < ε := by
+        simp [Metric.mem_closure_iff]
+      exact (this.1 hx_closure)
+
+    rcases hx' ε hε with ⟨y, hyK, hyDist⟩
+    refine ⟨y, hyK, ?_⟩
+    simpa [dist_comm] using hyDist
+
+  have hchoose :
+      ∀ n : ℕ, ∃ y, y ∈ K ∧ dist y x < (1 : ℝ) / (n + 1) := by
+    intro n
+    have hpos : 0 < (1 : ℝ) / (n + 1) := by
+      have : 0 < (n + 1 : ℝ) := by exact_mod_cast (Nat.succ_pos n)
+      exact one_div_pos.2 this
+    exact hx_closure' ((1 : ℝ) / (n + 1)) hpos
+
+  classical
+  choose y hyK hyDist using hchoose
 
 
-/-
-theorem compact_isClosed_notfromMathlib
---proof in a hausdorff space K (we prove for R specifically) then compact set in K implies closed without using hk.isClosed
-    {K : Set α} (hK : IsCompact K) : IsClosed K := by
-  -- A set is closed if its complement is open
-  -- We will show that for any point x not in K, there is an open neighborhood around x that does not intersect K
-  have h : IsClosed K := by
-    rw [isClosed_iff_nhds]
-    intro x hxKc
-    -- For each point y in K, we can find disjoint open neighborhoods around x and y
-    let U := ⋃ (y ∈ K), (nhds x).filter (fun V => V ∩ (nhds y).nonempty)
-    have hUopen : IsOpen U := isOpen_iUnion fun y hy => isOpen_filter
+  -- show y → x using epsilon-N
+  have hyT : Tendsto y atTop (nhds x) := by
+    refine Metric.tendsto_atTop.2 ?_
+    intro ε hε
+    -- choose N such that 1/(N+1) < ε
+    obtain ⟨N, hNε⟩ : ∃ N : ℕ, (1 : ℝ) / (N + 1) < ε := by
+      simpa using (exists_nat_one_div_lt hε)
 
-    -- Show that U does not intersect K
-    have hUcapK : U ∩ K = ∅ := by
-      intro z hz
-      rcases mem_iUnion.1 hz.1 with ⟨y, hyK, hzy⟩
-      rcases mem_filter.1 hzy with ⟨V, hVx, hVy⟩
-      have : z ∈ V := hVy.some_spec
-      have : z ∈ K := hz.2
-      -- This contradicts the disjointness of neighborhoods around x and y
-      exact (hVx.some_spec ∩ hVy.some_spec).elim
+    refine ⟨N, ?_⟩
+    intro n hn
+    -- dist(y n, x) < 1/(n+1) ≤ 1/(N+1) < ε
+    have h1 : dist (y n) x < (1 : ℝ) / (n + 1) := hyDist n
 
-    -- Thus, U is an open neighborhood of x that does not intersect K
-    exact ⟨U, hUopen, by simp [hUcapK]⟩
+    have hle_den : (N + 1 : ℝ) ≤ (n + 1 : ℝ) := by
+      exact_mod_cast (Nat.succ_le_succ hn)
+    have hpos_den : 0 < (N + 1 : ℝ) := by
+      exact_mod_cast (Nat.succ_pos N)
 
-  exact h
--/
+    have h2 : (1 : ℝ) / (n + 1) ≤ (1 : ℝ) / (N + 1) := by
+      simpa [one_div] using (one_div_le_one_div_of_le hpos_den hle_den)
+
+    have : dist (y n) x < ε :=
+      lt_of_lt_of_le h1 (le_trans h2 (le_of_lt hNε))
+    simpa using this
+
+  -- all subsequence tend to x
+  have hyT_subseq :
+      ∀ φ : ℕ → ℕ, StrictMono φ → Tendsto (y ∘ φ) atTop (nhds x) := by
+    intro φ hmono
+    have hφ : Tendsto φ atTop atTop := hmono.tendsto_atTop
+    exact hyT.comp hφ
+
+  -- contradict sequential compactness
+  -- extract a convergent subsequence with limit a ∈ K
+  rcases hK.tendsto_subseq hyK with ⟨a, haK, φ, hmono, hya⟩
+  -- subsequence also tends to x
+  have hyx : Tendsto (y ∘ φ) atTop (nhds x) := hyT_subseq φ hmono
+  -- uniqueness of limits gives a = x
+  have hax : a = x := tendsto_nhds_unique hya hyx
+  -- contradiction a ∈ K but x ∉ K
+  exact hx_notin (by simpa [hax] using haK)
+
+#check compact_implies_closed
 
 
 open Set
