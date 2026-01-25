@@ -6,7 +6,6 @@ import Mathlib.Topology.Separation.Hausdorff
 import TheoremProvingWithLean.Topology.Compact
 import TheoremProvingWithLean.Topology.HeineBorel
 
-import Mathlib
 
 namespace EVT
 
@@ -32,9 +31,9 @@ by
     continuous_image_compact_def hs hg_cont
 
   -- compact subset of R is closed and bounded using lemmas from Compact.lean and HeineBorel.lean
-  have hclosed : IsClosed (g '' s) := by
-    -- instantiate α := ℝ
-    simpa using (compact_implies_closed (α := ℝ) (K := (g '' s)) hcomp)
+    have hclosed : IsClosed (g '' s) := by
+    exact compact_implies_closed (K := (g '' s)) hcomp
+
 
   have hbounded : BddAbove (g '' s) := by
     rcases compact_implies_bounded (n := 0) (s := (g '' s)) hcomp with ⟨R, hR⟩
