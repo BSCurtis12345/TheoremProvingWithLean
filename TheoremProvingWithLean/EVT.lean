@@ -1,12 +1,18 @@
-import mathlib
--- import Mathlib.Topology.Separation.Hausdorff
--- import Mathlib.Data.Finset.Option
--- import Mathlib.Topology.Compactness.Compact
--- import Mathlib.Topology.Separation.Hausdorff
+import Mathlib.Topology.Compactness.Compact
+import Mathlib.Data.Finset.Option
+import Mathlib.Data.Real.Basic
+import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Topology.Order.Basic
+import Mathlib.Topology.Sequences
+
+import Mathlib.Analysis.InnerProductSpace.PiL2 -- topology on Fin n → ℝ
+import Mathlib.Topology.ContinuousMap.Basic
+import Mathlib.Topology.Sets.Compacts
+import Mathlib.Order.ConditionallyCompleteLattice.Basic -- sSup and le_csSup
+import Mathlib.Tactic.Linarith
+
 import TheoremProvingWithLean.Topology.Compact
 import TheoremProvingWithLean.Topology.HeineBorel
--- import Mathlib.Topology.Algebra.Group
--- import Mathlib.Topology.Compactness.Compact
 
 
 
