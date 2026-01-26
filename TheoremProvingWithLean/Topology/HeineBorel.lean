@@ -364,6 +364,4 @@ lemma compact_implies_bounded (s : Set ℝ) (hs : IsCompact s) :
       exact le_of_lt hxltN
 
 
-
-
 end HeineBorel

@@ -37,7 +37,7 @@ by
 
 
   have hbounded : BddAbove (g '' s) := by
-    rcases HeineBorel.compact_implies_bounded (s := (g '' s)) hcomp with ⟨R, hR⟩
+    rcases compact_implies_bounded (s := (g '' s)) hcomp with ⟨R, hR⟩
     refine ⟨R, ?_⟩
     intro x hx
     -- x ≤ |x| ≤ R
