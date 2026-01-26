@@ -63,7 +63,7 @@ Proves that for any x ∈ K, v ∈ Kⁿ, ∃ Uⱼ ∈ U s.t. (x,v) ∈ Uⱼ.
 variable [TopologicalSpace X]
 
 lemma exists_nhd_fin_cover_prod
-  (hK : IsCompact K) (hNonempty : K.Nonempty)
+  (hNonempty : K.Nonempty)
   (hKn : IsCompact {v : Fin n → X | ∀ (i : Fin n), v i ∈ K})
   (hcover : {v : Fin (n+1) → X | ∀ i, v i ∈ K} ⊆ ⋃ i, U i)
   (hopen : ∀ (i:ι), IsOpen (U i)) :
@@ -428,7 +428,7 @@ theorem IsCompact_pow_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.None
       (∃ (t : Finset I), (uncurry glue) '' (𝓝ₓ ×ˢ {v : Fin n → X | ∀ i, v i ∈ K})
         ⊆ ⋃ i ∈ t, U i)) :=
     -- For x ∈ K, ∃ an open neighbourhoud 𝓝(x) ⊆ K s.t. 𝓝(x)×Kⁿ can be covered by a finite subfamily of U
-      exists_nhd_fin_cover_prod hK hNonempty ih hcover hopen
+      exists_nhd_fin_cover_prod hNonempty ih hcover hopen
 
     rw [isCompact_iff_finite_subcover] at hK -- Rewrite hypothesis in terms of finite subcover definition
 
