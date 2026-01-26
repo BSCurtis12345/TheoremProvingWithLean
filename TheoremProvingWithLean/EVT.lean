@@ -1,14 +1,12 @@
-import mathlib
--- import Mathlib.Topology.Separation.Hausdorff
--- import Mathlib.Data.Finset.Option
--- import Mathlib.Topology.Compactness.Compact
--- import Mathlib.Topology.Separation.Hausdorff
+--import mathlib
+import Mathlib.Data.Finset.Option
+import Mathlib.Topology.Separation.Hausdorff
+import Mathlib.Topology.Compactness.Compact
+import Mathlib.Topology.Algebra.Group.Defs
+import Mathlib.Topology.Algebra.Ring.Real
+
 import TheoremProvingWithLean.Topology.Compact
 import TheoremProvingWithLean.Topology.HeineBorel
--- import Mathlib.Topology.Algebra.Group
--- import Mathlib.Topology.Compactness.Compact
-
-
 
 namespace EVT
 
@@ -34,7 +32,7 @@ by
     continuous_image_compact_def hs hg_cont
 
   -- compact subset of R is closed and bounded using lemmas from Compact.lean and HeineBorel.lean
-    have hclosed : IsClosed (g '' s) := by
+  have hclosed : IsClosed (g '' s) := by
     exact compact_implies_closed (K := (g '' s)) hcomp
 
 

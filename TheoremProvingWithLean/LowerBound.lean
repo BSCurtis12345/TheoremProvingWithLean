@@ -51,6 +51,7 @@ lemma closed_ball_sup_eq_pow : closed_ball_sup n = unit_Icc_pow n := by
   done
 
 open HeineBorel
+open ProductSpaces
 
 lemma IsCompact_closed_ball_sup : IsCompact (closed_ball_sup n) := by
   /-
