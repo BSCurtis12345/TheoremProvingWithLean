@@ -12,7 +12,6 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic -- sSup and le_csSup
 import Mathlib.Tactic.Linarith
 
 import TheoremProvingWithLean.Topology.Compact
-import TheoremProvingWithLean.Topology.HeineBorel
 
 
 
@@ -41,7 +40,7 @@ by
   by
     exact compact_implies_closed (K := (g '' s)) hcomp
   have hbounded : BddAbove (g '' s) := by
-    rcases HeineBorel.compact_implies_bounded (s := (g '' s)) hcomp with ⟨R, hR⟩
+    rcases compact_implies_bounded (s := (g '' s)) hcomp with ⟨R, hR⟩
     refine ⟨R, ?_⟩
     intro x hx
     -- x ≤ |x| ≤ R
