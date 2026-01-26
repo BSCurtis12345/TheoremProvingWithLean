@@ -9,7 +9,7 @@ import TheoremProvingWithLean.Topology.Compact
 import TheoremProvingWithLean.Topology.HeineBorel
 
 namespace EVT
-
+set_option linter.style.emptyLine false
 abbrev Rn (n : ℕ) := Fin n → ℝ
 
 theorem extreme_value_theorem_min
