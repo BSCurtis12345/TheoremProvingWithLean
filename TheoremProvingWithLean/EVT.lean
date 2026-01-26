@@ -1,11 +1,14 @@
-import Mathlib.Topology.Compactness.Compact
-import Mathlib.Topology.Separation.Hausdorff
-import Mathlib.Data.Finset.Option
-import Mathlib.Topology.Compactness.Compact
-import Mathlib.Topology.Separation.Hausdorff
+import mathlib
+-- import Mathlib.Topology.Separation.Hausdorff
+-- import Mathlib.Data.Finset.Option
+-- import Mathlib.Topology.Compactness.Compact
+-- import Mathlib.Topology.Separation.Hausdorff
 import TheoremProvingWithLean.Topology.Compact
+import TheoremProvingWithLean.Topology.HeineBorel
+-- import Mathlib.Topology.Algebra.Group
+-- import Mathlib.Topology.Compactness.Compact
 
-import Mathlib
+
 
 namespace EVT
 
@@ -30,14 +33,17 @@ by
   have hcomp : IsCompact (g '' s) :=
     continuous_image_compact_def hs hg_cont
 
-  -- compact subset of R is closed and bounded
-  have hclosed : IsClosed (g '' s) := hcomp.isClosed
-  have hbounded : BddAbove (g '' s) := hcomp.bddAbove
+  -- compact subset of R is closed and bounded using lemmas from Compact.lean and HeineBorel.lean
+    have hclosed : IsClosed (g '' s) := by
+    exact compact_implies_closed (K := (g '' s)) hcomp
 
-  --have hcb : IsClosed (g '' s) ∧ BddAbove (g '' s) :=
-  --HeineBorel.compact_closed_bounded (g '' s) hcomp
-  --have hclosed : IsClosed (g '' s) := hcb.1
-  --have hbounded : BddAbove (g '' s) := hcb.2
+
+  have hbounded : BddAbove (g '' s) := by
+    rcases HeineBorel.compact_implies_bounded (s := (g '' s)) hcomp with ⟨R, hR⟩
+    refine ⟨R, ?_⟩
+    intro x hx
+    -- x ≤ |x| ≤ R
+    exact le_trans (le_abs_self x) (hR x hx)
 
   have hne : (g '' s).Nonempty :=
     hs_nonempty.image g
