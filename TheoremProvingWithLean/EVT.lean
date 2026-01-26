@@ -1,11 +1,13 @@
-import Mathlib.Topology.Compactness.Compact
-import Mathlib.Topology.Separation.Hausdorff
-import Mathlib.Data.Finset.Option
-import Mathlib.Topology.Compactness.Compact
-import Mathlib.Topology.Separation.Hausdorff
+import mathlib
+-- import Mathlib.Topology.Separation.Hausdorff
+-- import Mathlib.Data.Finset.Option
+-- import Mathlib.Topology.Compactness.Compact
+-- import Mathlib.Topology.Separation.Hausdorff
 import TheoremProvingWithLean.Topology.Compact
 import TheoremProvingWithLean.Topology.HeineBorel
-import Mathlib.Topology.Algebra.Group.Defs
+-- import Mathlib.Topology.Algebra.Group
+-- import Mathlib.Topology.Compactness.Compact
+
 
 
 namespace EVT
@@ -37,7 +39,7 @@ by
 
 
   have hbounded : BddAbove (g '' s) := by
-    rcases compact_implies_bounded (n := 0) (s := (g '' s)) hcomp with ⟨R, hR⟩
+    rcases HeineBorel.compact_implies_bounded (s := (g '' s)) hcomp with ⟨R, hR⟩
     refine ⟨R, ?_⟩
     intro x hx
     -- x ≤ |x| ≤ R
