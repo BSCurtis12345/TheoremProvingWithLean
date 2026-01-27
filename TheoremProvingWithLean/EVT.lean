@@ -1,4 +1,3 @@
---import mathlib
 import Mathlib.Data.Finset.Option
 import Mathlib.Topology.Separation.Hausdorff
 import Mathlib.Topology.Compactness.Compact
@@ -76,5 +75,3 @@ by
   linarith
 
 end EVT
-
-#check EVT.extreme_value_theorem_min

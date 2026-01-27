@@ -1,4 +1,3 @@
-import mathlib
 import TheoremProvingWithLean.Norms
 import TheoremProvingWithLean.Topology.ProductSpaces
 import TheoremProvingWithLean.Topology.HeineBorel

@@ -19,7 +19,6 @@ lemma in_elt_cover
   have hsCover : s ∈ ⋃ i, U i := by exact hcover hs
   rw [Set.mem_iUnion] at hsCover
   exact hsCover
-  done
 
 lemma subset_fin_cover
   {S T : Set X}
@@ -31,7 +30,6 @@ lemma subset_fin_cover
   obtain ⟨n, hn⟩ := hs
   apply ht.trans at hn
   use n
-  done
 
 lemma union_fin_cover
   {S T : Set X}
@@ -60,6 +58,5 @@ lemma union_fin_cover
     obtain ⟨j, hj⟩ := hx
     use j
     exact And.intro (by simp [hj.1, k]) hj.2
-  done
 
 end Covers

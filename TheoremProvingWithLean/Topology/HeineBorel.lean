@@ -2,7 +2,6 @@ import Mathlib.Topology.Compactness.Compact
 import Mathlib.Order.Interval.Set.Defs
 import Mathlib.Topology.MetricSpace.Pseudo.Defs
 import TheoremProvingWithLean.Topology.Covers
---import TheoremProvingWithLean.Topology.OpenSets
 
 set_option linter.style.longLine false
 set_option linter.flexible false
@@ -19,7 +18,6 @@ Proves that a subset of a closed interval in ℝ is bounded above.
   refine ⟨b, fun x hx => ?_⟩ -- Take b as a witness, let x ∈ S
   have : x ∈ Set.Icc a b := h hx -- x ∈ [a,b]
   exact this.2 -- x ≤ b by definition
-  done
 
 lemma sup_subset_in_Icc {a b : ℝ} {S : Set ℝ} (hS : S.Nonempty) (hsub : S ⊆ Set.Icc a b) : sSup S ∈ Set.Icc a b := by
 /-
@@ -34,7 +32,6 @@ Proves that if ∅ ≠ S ⊆ [a,b], then sup S ∈ [a,b].
   · -- sup S ≤ b - true iff every b₁ ∈ S has b₁ ≤ b
     rw [csSup_le_iff (subset_Icc_bdd_above hsub) hS]
     intros c hc; exact (hsub hc).2
-  done
 
 lemma exists_Ioo_sub_open {U : Set ℝ} {x : ℝ} (hUopen : IsOpen U) (hx : x ∈ U) :
   ∃ ε > 0, Set.Ioo (x-ε) (x+ε) ⊆ U := by
@@ -49,7 +46,6 @@ Thus we use Metric.isOpen_iff to do most the work here.
   use ε
   rw [← Real.ball_eq_Ioo x ε]
   exact hε
-  done
 
 open Covers
 
@@ -78,7 +74,6 @@ lemma lower_singleton_Icc_fin_cover
     use J
     use j
     simp [J, hj]
-  done
 
 end Icc_finCover
 
@@ -268,7 +263,6 @@ Notable Mathlib results used:
   rw [hsupEqb] at hfinCoverε
   have : b < b + ε := by simp [hε]
   exact subset_fin_cover hfinCoverε (Set.Icc_subset_Ico_right this)
-  done
 
 
 lemma compact_implies_bounded (s : Set ℝ) (hs : IsCompact s) :

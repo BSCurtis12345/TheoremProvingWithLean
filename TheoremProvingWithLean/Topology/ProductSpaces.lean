@@ -58,7 +58,6 @@ Proves that for any x ∈ K, v ∈ Kⁿ, ∃ Uⱼ ∈ U s.t. (x,v) ∈ Uⱼ.
   | succ m => -- k = m+1
       simp [glue]
       simp at hv; exact hv ⟨m, Nat.lt_of_succ_lt_succ hk⟩
-  done
 
 variable [TopologicalSpace X]
 

@@ -46,7 +46,6 @@ theorem continuous_image_compact_def
   -- rewrite subtype into set union
   simpa [iUnion_subtype] using hx'
 
-#check continuous_image_compact_def
 
 
 open Set
@@ -142,7 +141,6 @@ theorem compact_implies_closed {K : Set ℝ} (hK : IsCompact K) : IsClosed K := 
   -- contradiction a ∈ K but x ∉ K
   exact hx_notin (by simpa [hax] using haK)
 
-#check compact_implies_closed
 
 
 open Set
@@ -177,11 +175,9 @@ theorem isCompact_of_isClosed_subset
   have hVcover : K ⊆ ⋃ i, V i := by
     intro x hxK
     by_cases hxS : x ∈ S
-    ·
-      rcases mem_iUnion.1 (hcover hxS) with ⟨i, hi⟩
+    · rcases mem_iUnion.1 (hcover hxS) with ⟨i, hi⟩
       exact mem_iUnion.2 ⟨some i, hi⟩
-    ·
-      exact mem_iUnion.2 ⟨none, hxS⟩
+    · exact mem_iUnion.2 ⟨none, hxS⟩
 
   -- compactness of K -> finite subcover
   obtain ⟨t, ht⟩ :=
@@ -202,8 +198,6 @@ theorem isCompact_of_isClosed_subset
       exact ⟨by
         simpa [Finset.mem_eraseNone] using hi,
         hxi⟩
-
-#check isCompact_of_isClosed_subset
 
 lemma compact_implies_bounded (s : Set ℝ) (hs : IsCompact s) :
   ∃ R : ℝ, ∀ x, x ∈ s → |x| ≤ R :=
@@ -228,8 +222,7 @@ lemma compact_implies_bounded (s : Set ℝ) (hs : IsCompact s) :
         -- Prove x ∈ ⋃ n, ball 0 (n+1)
         refine Set.mem_iUnion.mpr ?_
         refine ⟨n, ?_⟩
-        simp [Metric.ball, Real.dist_eq] at *
-        exact h2
+        simpa [Metric.ball, Real.dist_eq] using h2
       -- Prove s ⊆ ℝ
       have RcoverS : s ⊆ (Set.univ : Set ℝ) :=
       by
@@ -296,5 +289,3 @@ lemma compact_implies_bounded (s : Set ℝ) (hs : IsCompact s) :
         linarith
       -- Convert strict inequality to the required non-strict inequality
       exact le_of_lt hxltN
-
-#check compact_implies_bounded
