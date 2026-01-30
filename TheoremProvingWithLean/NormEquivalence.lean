@@ -1,3 +1,9 @@
+/-
+FINAL RESULT OF PROJECT.
+
+IF NOT DONE SO ALREADY, PLEASE READ `README.md` for project info.
+-/
+
 import TheoremProvingWithLean.UpperBound
 import TheoremProvingWithLean.LowerBound
 

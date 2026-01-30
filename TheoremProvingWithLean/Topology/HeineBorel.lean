@@ -265,8 +265,11 @@ Notable Mathlib results used:
   exact subset_fin_cover hfinCoverε (Set.Icc_subset_Ico_right this)
 
 lemma IsCompact_Icc_degen (a b : ℝ) (hab : b < a) : IsCompact (Set.Icc a b) := by
-
+/-
+Proves that closed intervals are compact in the degenerate case.
+-/
   have hempty : Set.Icc a b = ∅ := by
+  -- Get that a degenerate closed interval is the empty set.
     rw [Set.eq_empty_iff_forall_notMem]
     intro x
     by_contra hx
@@ -274,6 +277,7 @@ lemma IsCompact_Icc_degen (a b : ℝ) (hab : b < a) : IsCompact (Set.Icc a b) :=
     have : x < a := lt_of_le_of_lt hx.2 hab
     exact (lt_irrefl x) (lt_of_lt_of_le this hx.1)
 
+  -- Take ∅ as an index set for finite cover of ∅ = [a,b].
   rw [isCompact_iff_finite_subcover]
   intros I U hopen hcover
   refine ⟨∅, ?_⟩
@@ -282,7 +286,10 @@ lemma IsCompact_Icc_degen (a b : ℝ) (hab : b < a) : IsCompact (Set.Icc a b) :=
 
 
 theorem IsCompact_Icc (a b : ℝ) : IsCompact (Set.Icc a b) := by
-
+/-
+Proves that all closed intervals [a,b] in ℝ are compact (whether b ≥ a or not).
+-/
+  -- Split into degenerate and non-degenerate cases and conclude by previous results.
   by_cases hab : a ≤ b
   · exact IsCompact_Icc' a b hab
   · exact IsCompact_Icc_degen a b (by simpa using hab)
@@ -471,17 +478,23 @@ theorem compact_implies_closed {K : Set ℝ} (hK : IsCompact K) : IsClosed K := 
 
 theorem HeineBorel_R (K : Set ℝ) :
   IsCompact K ↔ IsClosed K ∧ (∃ R : ℝ, ∀ x, x ∈ K → |x| ≤ R) := by
-
+/-
+Proves the Heine-Borel theorem for ℝ - that sets are compact iff they are closed & bounded.
+-/
   constructor
-  · intro hK
+  · -- Assume K is compact - conclude by previous results
+    intro hK
     exact And.intro (compact_implies_closed hK) (compact_implies_bounded K hK)
-  · intro hK
+  · -- Assume K is closed and bounded.
+    intro hK
 
-    obtain ⟨R,hR⟩ := hK.2
+    obtain ⟨R,hR⟩ := hK.2 -- Get a bound R of K
     have : K ⊆ Set.Icc (-R) R := by
+    -- Then K ⊆ [-R,R]
       intro x hx
       exact abs_le.mp (hR x hx)
 
+    -- Then by previous result, [-R,R] is compact and as a closed subset of a compact set, K is compact.
     refine isCompact_of_isClosed_subset
       (IsCompact_Icc (-R) R)
       (hK.1)

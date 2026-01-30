@@ -9,6 +9,21 @@ The goal of our project, as laid out in the outline, was to formalise a proof th
 
 ## The Project
 
+* Topology : this folder deals with the major topological results of the project and is composed of the following:
+  * Compact.lean : this file contains lemmas for convenience in constructing covers and subcovers in other parts of the project, as well as the theorems that closed subsets of compact sets are compact, and continuous images of compact sets are compact.
+  * HeineBorel.lean : the main theorem of this file is that sets in $\mathbb{R}$ are compact iff they are closed and bounded. This and lemmas leading up to it are applied elsewhere also.
+  * ProductSpaces.lean : the main theorem here is that finite powers of compact sets in a space are themselves compact w.r.t. the product (Pi) topology.
+
+* EVT.lean : this file contains the lone theorem that continuous functions on compact sets to the reals attain their minima.
+
+* LowerBound.lean : this file contains a formalisation of the lower bound section of the project, i.e. proves existence of the $c$ in $c N(\cdot) \leq \lVert \cdot \rVert$.
+
+* NormEquivalence.lean : formalises the final result of the project - all norms on $\mathbb{R}^n$ are equivalent.
+
+* Norms.lean : a few basic results about norms using our seminorm definition (see below for elaboration), including continuity and reverse triangle inequality.
+
+* UpperBound.lean : the main theorem is the upper bound section of the final result. Also contains many lemmas about normed spaces in order to prove main part.
+
 ## Noteworthy Points
 
 * Throughout the project, in any statements about an arbitrary norm on $\mathbb{R}^n$, we use `(N : Seminorm $\mathbb{R}$ (Rn n))` and wherever it is required, we manually add the assumption of positive definiteness `(∀ x : Rn n, N x = 0 ↔ x = 0)`. The purpose of this is to make distinguishable statements about arbitrary norms $N(\cdot)$ from the supremum norm specifically, which Lean automatically evaluates $\lVert \cdot \rVert$ as wherever it can. This approach also comes with the added benefit of increased generality of those results for which the assumption of positive definiteness is not necessary.
