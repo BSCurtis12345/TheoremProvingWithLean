@@ -1,13 +1,8 @@
 import TheoremProvingWithLean.UpperBound
 import TheoremProvingWithLean.LowerBound
 
-import Mathlib.Analysis.Seminorm
-import Mathlib.Order.Defs.PartialOrder
 import Mathlib.Algebra.Order.GroupWithZero.Unbundled.Defs
-import Mathlib.Algebra.Order.GroupWithZero.Unbundled.Basic
 import Mathlib.Algebra.Group.Defs
-import Mathlib.Algebra.GroupWithZero.Basic
-
 
 -- Definition of ℝⁿ as functions Fin n → ℝ
 abbrev Rn (n : ℕ) := Fin n → ℝ

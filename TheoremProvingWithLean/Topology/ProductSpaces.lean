@@ -1,7 +1,8 @@
 import Mathlib.Topology.Defs.Filter
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Constructions
-import TheoremProvingWithLean.Topology.Covers
+
+import TheoremProvingWithLean.Topology.Compact
 
 set_option linter.flexible false
 set_option linter.style.longLine false
@@ -10,7 +11,7 @@ set_option linter.style.commandStart false
 
 namespace ProductSpaces
 
-open Covers
+open Compact
 
 variable {X : Type}
 
@@ -374,8 +375,6 @@ Notable Mathlib results used:
     simp [uncurry] at this
     exact this x' hx' y ha.2
 
-  done
-
 end lemmas
 
 variable [TopologicalSpace X]
@@ -559,7 +558,5 @@ theorem IsCompact_pow_compact {K : Set X} (hK : IsCompact K) (hNonempty : K.None
           | succ m => simp [glue]
     refine ⟨t, ?_⟩
     simpa [hglue_eq_Kn] using ht
-
-  done
 
 end ProductSpaces

@@ -1,7 +1,8 @@
+import Mathlib.Order.Filter.Defs
 import Mathlib.Topology.Compactness.Compact
-import Mathlib.Order.Interval.Set.Defs
 import Mathlib.Topology.MetricSpace.Pseudo.Defs
-import TheoremProvingWithLean.Topology.Covers
+
+import TheoremProvingWithLean.Topology.Compact
 
 set_option linter.style.longLine false
 set_option linter.flexible false
@@ -47,7 +48,7 @@ Thus we use Metric.isOpen_iff to do most the work here.
   rw [← Real.ball_eq_Ioo x ε]
   exact hε
 
-open Covers
+open Compact
 
 section Icc_finCover
 
@@ -77,8 +78,7 @@ lemma lower_singleton_Icc_fin_cover
 
 end Icc_finCover
 
-
-theorem IsCompact_Icc (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
+theorem IsCompact_Icc' (a b : ℝ) (h : a ≤ b) : IsCompact (Set.Icc a b) := by
 /-
 This theorem proves that every (non-degenerate) closed interval in R is compact (with the usual topology).
 
@@ -264,6 +264,29 @@ Notable Mathlib results used:
   have : b < b + ε := by simp [hε]
   exact subset_fin_cover hfinCoverε (Set.Icc_subset_Ico_right this)
 
+lemma IsCompact_Icc_degen (a b : ℝ) (hab : b < a) : IsCompact (Set.Icc a b) := by
+
+  have hempty : Set.Icc a b = ∅ := by
+    rw [Set.eq_empty_iff_forall_notMem]
+    intro x
+    by_contra hx
+    simp at hx
+    have : x < a := lt_of_le_of_lt hx.2 hab
+    exact (lt_irrefl x) (lt_of_lt_of_le this hx.1)
+
+  rw [isCompact_iff_finite_subcover]
+  intros I U hopen hcover
+  refine ⟨∅, ?_⟩
+  intro x hx
+  simp [hempty] at hx
+
+
+theorem IsCompact_Icc (a b : ℝ) : IsCompact (Set.Icc a b) := by
+
+  by_cases hab : a ≤ b
+  · exact IsCompact_Icc' a b hab
+  · exact IsCompact_Icc_degen a b (by simpa using hab)
+
 
 lemma compact_implies_bounded (s : Set ℝ) (hs : IsCompact s) :
   ∃ R : ℝ, ∀ x, x ∈ s → |x| ≤ R :=
@@ -357,5 +380,111 @@ lemma compact_implies_bounded (s : Set ℝ) (hs : IsCompact s) :
       -- Convert strict inequality to the required non-strict inequality
       exact le_of_lt hxltN
 
+open Filter
+
+theorem compact_implies_closed {K : Set ℝ} (hK : IsCompact K) : IsClosed K := by
+  classical
+  by_contra hClosed
+
+  -- From ¬IsClosed K, we get ¬(closure K ⊆ K)
+  have h_not_closure : ¬ closure K ⊆ K := by
+    intro hsub
+    -- If closure K ⊆ K then closure K = K
+    have hEq : closure K = K := subset_antisymm hsub subset_closure
+    -- But closure K is closed so K is closed
+    have hKclosed : IsClosed K := by
+      simpa [hEq] using (isClosed_closure : IsClosed (closure K))
+    exact hClosed hKclosed
+
+  -- from ¬(closure K ⊆ K) get x ∈ closure K \ K
+  have hx_exists : ∃ x, x ∈ closure K ∧ x ∉ K := by
+    simpa [Set.subset_def] using h_not_closure
+  rcases hx_exists with ⟨x, hx_closure, hx_notin⟩
+
+  -- from x ∈ closure K we build a sequence y n ∈ K with dist < 1/(n+1)
+  have hx_closure' :
+      ∀ ε : ℝ, 0 < ε → ∃ y, y ∈ K ∧ dist y x < ε := by
+    intro ε hε
+    have hx' : ∀ ε : ℝ, 0 < ε → ∃ b ∈ K, dist x b < ε := by
+      have : x ∈ closure K ↔ ∀ ε : ℝ, 0 < ε → ∃ b ∈ K, dist x b < ε := by
+        simp [Metric.mem_closure_iff]
+      exact (this.1 hx_closure)
+
+    rcases hx' ε hε with ⟨y, hyK, hyDist⟩
+    refine ⟨y, hyK, ?_⟩
+    simpa [dist_comm] using hyDist
+
+  have hchoose :
+      ∀ n : ℕ, ∃ y, y ∈ K ∧ dist y x < (1 : ℝ) / (n + 1) := by
+    intro n
+    have hpos : 0 < (1 : ℝ) / (n + 1) := by
+      have : 0 < (n + 1 : ℝ) := by exact_mod_cast (Nat.succ_pos n)
+      exact one_div_pos.2 this
+    exact hx_closure' ((1 : ℝ) / (n + 1)) hpos
+
+  classical
+  choose y hyK hyDist using hchoose
+
+
+  -- show y → x using epsilon-N
+  have hyT : Tendsto y atTop (nhds x) := by
+    refine Metric.tendsto_atTop.2 ?_
+    intro ε hε
+    -- choose N such that 1/(N+1) < ε
+    obtain ⟨N, hNε⟩ : ∃ N : ℕ, (1 : ℝ) / (N + 1) < ε := by
+      simpa using (exists_nat_one_div_lt hε)
+
+    refine ⟨N, ?_⟩
+    intro n hn
+    -- dist(y n, x) < 1/(n+1) ≤ 1/(N+1) < ε
+    have h1 : dist (y n) x < (1 : ℝ) / (n + 1) := hyDist n
+
+    have hle_den : (N + 1 : ℝ) ≤ (n + 1 : ℝ) := by
+      exact_mod_cast (Nat.succ_le_succ hn)
+    have hpos_den : 0 < (N + 1 : ℝ) := by
+      exact_mod_cast (Nat.succ_pos N)
+
+    have h2 : (1 : ℝ) / (n + 1) ≤ (1 : ℝ) / (N + 1) := by
+      simpa [one_div] using (one_div_le_one_div_of_le hpos_den hle_den)
+
+    have : dist (y n) x < ε :=
+      lt_of_lt_of_le h1 (le_trans h2 (le_of_lt hNε))
+    simpa using this
+
+  -- all subsequence tend to x
+  have hyT_subseq :
+      ∀ φ : ℕ → ℕ, StrictMono φ → Tendsto (y ∘ φ) atTop (nhds x) := by
+    intro φ hmono
+    have hφ : Tendsto φ atTop atTop := hmono.tendsto_atTop
+    exact hyT.comp hφ
+
+  -- contradict sequential compactness
+  -- extract a convergent subsequence with limit a ∈ K
+  rcases hK.tendsto_subseq hyK with ⟨a, haK, φ, hmono, hya⟩
+  -- subsequence also tends to x
+  have hyx : Tendsto (y ∘ φ) atTop (nhds x) := hyT_subseq φ hmono
+  -- uniqueness of limits gives a = x
+  have hax : a = x := tendsto_nhds_unique hya hyx
+  -- contradiction a ∈ K but x ∉ K
+  exact hx_notin (by simpa [hax] using haK)
+
+
+theorem HeineBorel_R (K : Set ℝ) :
+  IsCompact K ↔ IsClosed K ∧ (∃ R : ℝ, ∀ x, x ∈ K → |x| ≤ R) := by
+
+  constructor
+  · intro hK
+    exact And.intro (compact_implies_closed hK) (compact_implies_bounded K hK)
+  · intro hK
+
+    obtain ⟨R,hR⟩ := hK.2
+    have : K ⊆ Set.Icc (-R) R := by
+      intro x hx
+      exact abs_le.mp (hR x hx)
+
+    refine isCompact_of_isClosed_subset
+      (IsCompact_Icc (-R) R)
+      (hK.1)
+      (this)
 
 end HeineBorel

@@ -1,7 +1,4 @@
-import Mathlib.Data.Finset.Option
-import Mathlib.Topology.Separation.Hausdorff
 import Mathlib.Topology.Compactness.Compact
-import Mathlib.Topology.Algebra.Group.Defs
 import Mathlib.Topology.Algebra.Ring.Real
 
 import TheoremProvingWithLean.Topology.Compact
@@ -10,6 +7,9 @@ import TheoremProvingWithLean.Topology.HeineBorel
 namespace EVT
 set_option linter.style.emptyLine false
 abbrev Rn (n : ℕ) := Fin n → ℝ
+
+open Compact
+open HeineBorel
 
 theorem extreme_value_theorem_min
   (n : ℕ)

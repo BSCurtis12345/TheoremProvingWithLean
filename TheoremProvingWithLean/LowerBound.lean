@@ -1,11 +1,9 @@
 import TheoremProvingWithLean.Norms
 import TheoremProvingWithLean.Topology.ProductSpaces
 import TheoremProvingWithLean.Topology.HeineBorel
-import TheoremProvingWithLean.UpperBound
-import TheoremProvingWithLean.continuity
-import TheoremProvingWithLean.EVT
-import TheoremProvingWithLean.UpperBound
 import TheoremProvingWithLean.Topology.Compact
+import TheoremProvingWithLean.UpperBound
+import TheoremProvingWithLean.EVT
 
 set_option linter.style.longLine false
 set_option linter.flexible false
@@ -51,6 +49,8 @@ lemma closed_ball_sup_eq_pow : closed_ball_sup n = unit_Icc_pow n := by
 
 open HeineBorel
 open ProductSpaces
+open Compact
+open Norms
 
 lemma IsCompact_closed_ball_sup : IsCompact (closed_ball_sup n) := by
   /-
@@ -58,11 +58,10 @@ lemma IsCompact_closed_ball_sup : IsCompact (closed_ball_sup n) := by
   -/
   rw [closed_ball_sup_eq_pow] -- Rewrite the closed ball as [-1,1]ⁿ
   apply IsCompact_pow_compact -- Use that a finite power of a compact set is compact theorem
-  · exact IsCompact_Icc (-1) (1) (by simp) -- By theorem, [-1,1] is compact
+  · exact IsCompact_Icc' (-1) (1) (by simp) -- By theorem, [-1,1] is compact
   · use 0; simp -- 0 ∈ [-1,1] so [-1,1] is non-empty
   done
 
-open Continuity
 
 lemma IsCompact_closed_sphere_sup (hn : 0 < n) : IsCompact (S_infinity n) := by
   /-
@@ -145,7 +144,6 @@ by
   exact Set.nonempty_of_mem hyS
 
 
-
 theorem Lower_Bound (n : ℕ) (N : Seminorm ℝ (Rn n))
   (h_def : ∀ x : Rn n, N x = 0 ↔ x = 0) (h_dim : 0 < n) :
   ∃ c > 0, ∀ x : Rn n, c * ‖x‖ ≤ N x :=
@@ -158,7 +156,7 @@ theorem Lower_Bound (n : ℕ) (N : Seminorm ℝ (Rn n))
     -- The seminorm N is continuous as a function Rn n → ℝ
     have hN_cont : Continuous (fun x : Rn n => (N x : ℝ)) :=
     by
-      exact Continuity.norm_continuous n N h_def h_dim
+      exact norm_continuous n N h_def h_dim
     -- Apply the extreme value theorem (minimum form) to get the value of x0 that minimises N on S_infinity
     have hmin : ∃ x0 ∈ S_infinity n, ∀ y ∈ S_infinity n, N x0 ≤ N y :=
     by
